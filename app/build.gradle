@@ -2,16 +2,31 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
+    signingConfigs {
+        release {
+            keyAlias 'android'
+            keyPassword 'androidpass'
+            storeFile file('../E9631.jks')
+            storePassword 'android'
+        }
+    }
     defaultConfig {
-        applicationId "com.example.twovideotest"
-        minSdkVersion 15
+        applicationId "com.example.twovideotest2"
+        minSdkVersion 21
         targetSdkVersion 23
         versionCode 1
         versionName "1.1"
+        signingConfig signingConfigs.release
     }
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            signingConfig signingConfigs.release
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

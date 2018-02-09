@@ -352,12 +352,15 @@ public class VideoService extends Service implements
         } else {
             if (mPreviewing[index]) {
                 try {
+                    Thread.sleep(160);
                     mCameraDevice[index].setPreviewTexture(surfaceTexture);
                 } catch (IOException ex) {
                     mPreviewing[index] = false;
                     //closeCamera();
                     Log.e(TAG, "startPreview failed", ex);
                     return FAIL;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             } else {
                 Log.d(TAG, "mCameraDevice " + mCameraDevice + " mErrorCallback =" + mErrorCallback);
@@ -372,13 +375,15 @@ public class VideoService extends Service implements
                     mCameraDevice[index].setPreviewTexture(surfaceTexture);
                     mCameraDevice[index].startPreview();
                     Thread.sleep(160);
+                    //Thread.currentThread().sleep(160);
                     mPreviewing[index] = true;
                 } catch (IOException ex) {
                     mPreviewing[index] = false;
                     //closeCamera();
                     Log.e(TAG, "startPreview failed", ex);
                     return FAIL;
-                } catch (InterruptedException e) {
+                }
+                catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
