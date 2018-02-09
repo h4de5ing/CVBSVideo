@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
@@ -298,7 +297,7 @@ public class VideoService extends Service implements
         try {
             mCameraDevice[index] = Camera.open(index);
             if (index >= 4 && index <= 7) {
-                mCameraDevice[index].setAnalogInputColor(67, 50, 100); //setting brightness and so on
+                //mCameraDevice[index].setAnalogInputColor(67, 50, 100); //setting brightness and so on
                 //	int status = Camera.getCVBSInStatus(index);
                 //	Log.d(TAG,"cvbs cameraid=" + index + " status=" + status);
             }
@@ -346,38 +345,42 @@ public class VideoService extends Service implements
     }
 
     public synchronized int startPreview(int index, SurfaceTexture surfaceTexture) {
-        Log.d(TAG, "startPreview index=" + index);
         int state = openCamera(index);
-        if (state == -1)
+        Log.d(TAG, "startPreview index=" + index + " openCamera:" + state);
+        if (state == -1) {
             return FAIL;
-
-        if (mPreviewing[index]) {
-            try {
-                mCameraDevice[index].setPreviewTexture(surfaceTexture);
-            } catch (IOException ex) {
-                mPreviewing[index] = false;
-                //closeCamera();
-                Log.e(TAG, "startPreview failed", ex);
-                return FAIL;
-            }
         } else {
-            Log.d(TAG, "mCameraDevice " + mCameraDevice + " mErrorCallback =" + mErrorCallback);
-            mCameraDevice[index].setErrorCallback(mErrorCallback);
+            if (mPreviewing[index]) {
+                try {
+                    mCameraDevice[index].setPreviewTexture(surfaceTexture);
+                } catch (IOException ex) {
+                    mPreviewing[index] = false;
+                    //closeCamera();
+                    Log.e(TAG, "startPreview failed", ex);
+                    return FAIL;
+                }
+            } else {
+                Log.d(TAG, "mCameraDevice " + mCameraDevice + " mErrorCallback =" + mErrorCallback);
+/*            mCameraDevice[index].setErrorCallback(mErrorCallback);
             Parameters param = mCameraDevice[index].getParameters();
             List<Size> sizes = param.getSupportedPreviewSizes();
             for (Size size : sizes) {
                 Log.d(TAG, "size.width=" + size.width + " height" + size.height);
-            }
-            try {
-                //mCameraDevice[index].setDisplayOrientation(180);
-                mCameraDevice[index].setPreviewTexture(surfaceTexture);
-                mCameraDevice[index].startPreview();
-                mPreviewing[index] = true;
-            } catch (IOException ex) {
-                mPreviewing[index] = false;
-                //closeCamera();
-                Log.e(TAG, "startPreview failed", ex);
-                return FAIL;
+            }*/
+                try {
+                    //mCameraDevice[index].setDisplayOrientation(180);
+                    mCameraDevice[index].setPreviewTexture(surfaceTexture);
+                    mCameraDevice[index].startPreview();
+                    Thread.sleep(160);
+                    mPreviewing[index] = true;
+                } catch (IOException ex) {
+                    mPreviewing[index] = false;
+                    //closeCamera();
+                    Log.e(TAG, "startPreview failed", ex);
+                    return FAIL;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
         return OK;
@@ -706,9 +709,9 @@ public class VideoService extends Service implements
         mContext = this;
         setPath();
         initVideoMemembers();
-        IntentFilter filter = new IntentFilter("android.hardware.tvd.state.change");
+        /*IntentFilter filter = new IntentFilter("android.hardware.tvd.state.change");
         mReceiver = new Receiver();
-        registerReceiver(mReceiver, filter);
+        registerReceiver(mReceiver, filter);*/
     }
 
     private class Receiver extends BroadcastReceiver {
@@ -716,11 +719,11 @@ public class VideoService extends Service implements
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
 
-            Log.d(TAG, "action=" + action);
+            //Log.d(TAG, "action=" + action);
             if (action.equals("android.hardware.tvd.state.change")) {
                 int cameraid = intent.getIntExtra("index", -1);
                 int status = intent.getIntExtra("state", 0);
-                Log.d(TAG, "cameraid=" + cameraid + " status=" + status);
+                //Log.d(TAG, "cameraid=" + cameraid + " status=" + status);
             }
         }
     }
@@ -733,7 +736,7 @@ public class VideoService extends Service implements
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(mReceiver);
+        //unregisterReceiver(mReceiver);
         Log.d(TAG, "videService onDestroy###############");
     }
 
