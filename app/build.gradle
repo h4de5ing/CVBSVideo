@@ -6,7 +6,7 @@ android {
         release {
             keyAlias 'android'
             keyPassword 'androidpass'
-            storeFile file('../E9631.jks')
+            storeFile file('E9631.jks')
             storePassword 'android'
         }
     }
