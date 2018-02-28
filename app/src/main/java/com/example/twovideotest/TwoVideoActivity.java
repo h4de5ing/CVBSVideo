@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.SurfaceTexture;
+import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -18,62 +19,88 @@ import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class TwoVideoActivity extends AppCompatActivity implements View.OnClickListener {
-    private static final String TAG = "gh0st TwoVideoActivity";
+public class TwoVideoActivity extends AppCompatActivity implements MediaRecorder.OnErrorListener, MediaRecorder.OnInfoListener, View.OnClickListener {
+    private static final String TAG = "gh0sttwo";
     private static final int MAX_NUM_OF_CAMERAS = 2;
     private static final int UPDATE_RECORD_TIME = 1;
     private static final int HIDDEN_CTL_MENU_BAR = 2;
     private static final int UPDATE_RECORD_TIME1 = 3;
-    private static final int mRecordTag0 = 0;
-    private static final int mRecordTag1 = 1;
-    private TextureView textureView0;
-    private TextureView textureView1;
+    private VideoService mService = null;
+    private LinearLayout mCtrlMenuBar;
+    private ImageButton mRecordButton;
+    private ImageButton mRecordButton1;
+    private ImageButton mBackButton;
+    private ImageButton mBackButton1;
     private SurfaceTexture mSurfaceTexture0;
     private SurfaceTexture mSurfaceTexture1;
-    private TextView mRecordTime0;
+    private TextView mRecordTime;
     private TextView mRecordTime1;
-    private ImageButton mRecordButton0;
-    private ImageButton mRecordButton1;
-    private VideoService mService = null;
+    private BroadcastReceiver mReceiver;
+    private static final int VIDEO0 = 0;
+    private static final int VIDEO1 = 1;
+    private static final int VIDEO2 = 2;
+    private static final int VIDEO3 = 3;
+    private static final int VIDEO4 = 4;
+    private static final int VIDEO5 = 5;
     private static final int VIDEO6 = 6;
     private static final int VIDEO7 = 7;
+
     private int cameraid0 = VIDEO6;
     private int cameraid1 = VIDEO7;
+
+    private static final boolean mIsSupport2Video = true;
+
     private final Handler mHandler = new MainHandler();
 
     @Override
     public void onClick(View view) {
-        switch ((int) view.getTag()) {
-            case mRecordTag0:
-                if (mService != null) {
-                    int cameraid = mService.isUVCCameraSonix(cameraid0);
-                    if (getRecordingState(cameraid)) {//如果正在录像,就停止录像
+        int id = view.getId();
+        Log.d(TAG, "onCtrlMenuBarClick id=" + id);
+        switch (id) {
+            case R.id.recordbutton:
+                int cameraid = mService.isUVCCameraSonix(cameraid0);
+                if (getRecordingState(cameraid)) {
+                    if (mService != null) {
                         mService.stopVideoRecording(cameraid);
-                        mRecordTime0.setVisibility(View.GONE);
-                        mRecordButton0.setImageResource(R.drawable.record_select);
-                    } else {
-                        mService.startVideoRecording(cameraid, mSurfaceTexture0);
-                        mRecordTime0.setVisibility(View.VISIBLE);
-                        mRecordButton0.setImageResource(R.drawable.pause_select);
+                        mRecordTime.setVisibility(View.GONE);
+                        mRecordButton.setImageResource(R.drawable.record_select);
                     }
+                } else {
+                    if (mService != null) {
+                        mService.startVideoRecording(cameraid, mSurfaceTexture0);
+                        mRecordTime.setVisibility(View.VISIBLE);
+                        mRecordButton.setImageResource(R.drawable.pause_select);
+                    }
+
                 }
                 break;
-            case mRecordTag1:
-                if (mService != null) {
-                    int cameraid = mService.isUVCCameraSonix(cameraid1);
-                    if (getRecordingState(cameraid)) {
-                        mService.stopVideoRecording(cameraid);
+            case R.id.recordbutton2:
+                if (getRecordingState(cameraid1)) {
+                    if (mService != null) {
+                        mService.stopVideoRecording(cameraid1);
                         mRecordTime1.setVisibility(View.GONE);
                         mRecordButton1.setImageResource(R.drawable.record_select);
-                    } else {
-                        mService.startVideoRecording(cameraid, mSurfaceTexture1);
+                    }
+                } else {
+                    if (mService != null) {
+                        mService.startVideoRecording(cameraid1, mSurfaceTexture1);
                         mRecordTime1.setVisibility(View.VISIBLE);
                         mRecordButton1.setImageResource(R.drawable.pause_select);
                     }
+
                 }
                 break;
+            case R.id.settingbutton:
+                finish();
+                break;
+            case R.id.settingbutton2:
+                finish();
+                break;
+
         }
     }
 
@@ -81,56 +108,49 @@ public class TwoVideoActivity extends AppCompatActivity implements View.OnClickL
     private class MainHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
-            Log.d(TAG, "handleMessage message: " + msg.what);
+            //Log.d(TAG, "handleMessage message: " + msg.what);
             switch (msg.what) {
-                case UPDATE_RECORD_TIME:
-                    mRecordTime0.setText((String) msg.obj);
+                case UPDATE_RECORD_TIME: {
+                    //updateRecordingTime((String)msg.obj);
+                    mRecordTime.setText((String) msg.obj);
                     break;
+                }
                 case UPDATE_RECORD_TIME1:
                     mRecordTime1.setText((String) msg.obj);
+                    break;
+                case HIDDEN_CTL_MENU_BAR: {
+                }
+                break;
+                default:
+
                     break;
             }
         }
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_two_video);
-        View videoView0 = findViewById(R.id.video_0);
-        View videoView1 = findViewById(R.id.video_1);
-        textureView0 = (TextureView) videoView0.findViewById(R.id.video);
-        mRecordTime0 = (TextView) videoView0.findViewById(R.id.recording_time);
-        mRecordButton0 = (ImageButton) videoView0.findViewById(R.id.recordbutton);
-        textureView1 = (TextureView) videoView1.findViewById(R.id.video);
-        mRecordTime1 = (TextView) videoView1.findViewById(R.id.recording_time);
-        mRecordButton1 = (ImageButton) videoView1.findViewById(R.id.recordbutton);
-        mRecordButton0.setTag(mRecordTag0);
-        mRecordButton1.setTag(mRecordTag1);
-        mRecordButton0.setOnClickListener(this);
-        mRecordButton1.setOnClickListener(this);
-        startVideoService();
-        initVideoView();
-        IntentFilter intentFilter = new IntentFilter("com.android.twovideotest");
-        registerReceiver(RecordBroadcastReceiver, intentFilter);
-    }
-
-
-    private void startVideoService() {
-        Log.d(TAG, "#############startVideoService####################");
-        Intent intent = new Intent(this, VideoService.class);
-        startService(intent);
-    }
-
-    private void stopVideoService() {
-        Log.d(TAG, "###########stopVideoService##################");
-        Intent intent = new Intent(this, VideoService.class);
-        stopService(intent);
-    }
+    private IVideoCallback.Stub mVideoCallback = new IVideoCallback.Stub() {
+        @Override
+        public void onUpdateTimes(int index, String times) throws RemoteException {
+            mHandler.removeMessages(UPDATE_RECORD_TIME);
+            Message message = new Message();
+            //Log.d(TAG,"onUpdateTimes index=" + index);
+            if (index != mService.isUVCCameraSonix(index)) {
+                message.what = UPDATE_RECORD_TIME;
+            } else if (index == cameraid0) {
+                message.what = UPDATE_RECORD_TIME;
+            } else {
+                message.what = UPDATE_RECORD_TIME1;
+            }
+            message.obj = times;
+            mHandler.sendMessage(message);
+        }
+    };
 
     private ServiceConnection mVideoServiceConn = new ServiceConnection() {
         public void onServiceConnected(ComponentName classname, IBinder obj) {
+
             mService = ((VideoService.LocalBinder) obj).getService();
+            Log.d(TAG, "mService=" + mService);
             mService.registerCallback(mVideoCallback);
         }
 
@@ -143,7 +163,7 @@ public class TwoVideoActivity extends AppCompatActivity implements View.OnClickL
     };
 
     private void bindVideoService() {
-        L.d(TAG, "bindVideoService###############");
+        Log.d(TAG, "bindVideoService###############");
         Intent intent = new Intent(this, VideoService.class);
         bindService(intent, mVideoServiceConn, Context.BIND_AUTO_CREATE);
     }
@@ -169,46 +189,6 @@ public class TwoVideoActivity extends AppCompatActivity implements View.OnClickL
         unbindVideoService();
     }
 
-    @Override
-    protected void onDestroy() {
-        Log.d(TAG, "##########onDestroy#############");
-        int cameraid = mService.isUVCCameraSonix(cameraid0);
-        if (cameraid == cameraid0) {
-            if (!getRecordingState(cameraid0) && !getRecordingState(cameraid1)) {
-                stopVideoService();
-            }
-        } else {
-            if (!getRecordingState(cameraid) && !getRecordingState(cameraid1)) {
-                stopVideoService();
-            }
-        }
-        unregisterReceiver(RecordBroadcastReceiver);
-        super.onDestroy();
-    }
-
-    private IVideoCallback.Stub mVideoCallback = new IVideoCallback.Stub() {
-        @Override
-        public void onUpdateTimes(int index, String times) throws RemoteException {
-            mHandler.removeMessages(UPDATE_RECORD_TIME);
-            Message message = new Message();
-            //Log.d(TAG,"onUpdateTimes index=" + index);
-            if (index != mService.isUVCCameraSonix(index)) {
-                message.what = UPDATE_RECORD_TIME;
-            } else if (index == cameraid0) {
-                message.what = UPDATE_RECORD_TIME;
-            } else {
-                message.what = UPDATE_RECORD_TIME1;
-            }
-            message.obj = times;
-            mHandler.sendMessage(message);
-        }
-    };
-    private View.OnLayoutChangeListener mLayoutListener = new View.OnLayoutChangeListener() {
-        @Override
-        public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-        }
-    };
-
     private boolean getRecordingState(int index) {
         if (mService != null)
             return mService.getRecordingState(index);
@@ -216,6 +196,8 @@ public class TwoVideoActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void startPreview(int cameraId, SurfaceTexture surfaceTexture) {
+
+        Log.d(TAG, "mService=" + mService + " surfaceTexture=" + surfaceTexture);
         if (mService != null && (surfaceTexture != null)) {
             mService.startPreview(cameraId, surfaceTexture);
         }
@@ -227,81 +209,152 @@ public class TwoVideoActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    public BroadcastReceiver RecordBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Intent action=" + intent.getAction());
-            int startRecord = intent.getIntExtra("start", -1);
-            int stopRecord = intent.getIntExtra("stop", -1);
-            Log.d(TAG, "startRecord=" + startRecord + " stopRecord=" + stopRecord);
-            if (startRecord == 0) {
-                mService.startVideoRecording(cameraid0, mSurfaceTexture0);
-                mRecordTime0.setVisibility(View.VISIBLE);
-                mRecordButton0.setImageResource(R.drawable.pause_select);
-            } else if (startRecord == 1) {
-                mService.startVideoRecording(cameraid1, mSurfaceTexture1);
-                mRecordTime1.setVisibility(View.VISIBLE);
-                mRecordButton1.setImageResource(R.drawable.pause_select);
-            } else if (startRecord == 2) {
-                mService.startVideoRecording(cameraid0, mSurfaceTexture0);
-                mRecordTime0.setVisibility(View.VISIBLE);
-                mRecordButton0.setImageResource(R.drawable.pause_select);
-                mService.startVideoRecording(cameraid1, mSurfaceTexture1);
-                mRecordTime1.setVisibility(View.VISIBLE);
-                mRecordButton1.setImageResource(R.drawable.pause_select);
+    private void startVideoService() {
+        Log.d(TAG, "#############startVideoService####################");
+        Intent intent = new Intent(TwoVideoActivity.this, VideoService.class);
+        startService(intent);
+    }
+
+    private void stopVideoService() {
+        Log.d(TAG, "###########stopVideoService##################");
+        Intent intent = new Intent(this, VideoService.class);
+        stopService(intent);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate start");
+        //requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.activity_main);
+        startVideoService();
+        mCtrlMenuBar = (LinearLayout) findViewById(R.id.ctrl_menu_bar);
+        mRecordButton = (ImageButton) findViewById(R.id.recordbutton);
+        mBackButton = (ImageButton) findViewById(R.id.settingbutton);
+        mRecordTime = (TextView) findViewById(R.id.recording_time);
+        mRecordTime1 = (TextView) findViewById(R.id.recording_time1);
+        mRecordButton1 = (ImageButton) findViewById(R.id.recordbutton2);
+        mBackButton1 = (ImageButton) findViewById(R.id.settingbutton2);
+        RelativeLayout layout = (RelativeLayout) findViewById(R.id.surface2);
+        mRecordButton.setOnClickListener(this);
+        mRecordButton1.setOnClickListener(this);
+        if (!mIsSupport2Video)
+            layout.setVisibility(View.GONE);
+        mBackButton.setVisibility(View.GONE);
+        mBackButton1.setVisibility(View.GONE);
+        initVideoView();
+        mReceiver = new BroadcastReceiver() {
+
+            @Override
+            public void onReceive(Context arg0, Intent arg1) {
+                Log.d(TAG, "Intent action=" + arg1.getAction());
+                int startRecord = arg1.getIntExtra("start", -1);
+                int stopRecord = arg1.getIntExtra("stop", -1);
+                Log.d(TAG, "startRecord=" + startRecord + " stopRecord=" + stopRecord);
+                if (startRecord == 0) {
+                    mService.startVideoRecording(cameraid0, mSurfaceTexture0);
+                    mRecordTime.setVisibility(View.VISIBLE);
+                    mRecordButton.setImageResource(R.drawable.pause_select);
+                } else if (startRecord == 1) {
+                    mService.startVideoRecording(cameraid1, mSurfaceTexture1);
+                    mRecordTime1.setVisibility(View.VISIBLE);
+                    mRecordButton1.setImageResource(R.drawable.pause_select);
+                } else if (startRecord == 2) {
+                    mService.startVideoRecording(cameraid0, mSurfaceTexture0);
+                    mRecordTime.setVisibility(View.VISIBLE);
+                    mRecordButton.setImageResource(R.drawable.pause_select);
+
+                    mService.startVideoRecording(cameraid1, mSurfaceTexture1);
+                    mRecordTime1.setVisibility(View.VISIBLE);
+                    mRecordButton1.setImageResource(R.drawable.pause_select);
+                }
+
+
+                if (stopRecord == 0) {
+                    mService.stopVideoRecording(cameraid0);
+                    mRecordTime.setVisibility(View.GONE);
+                    mRecordButton.setImageResource(R.drawable.record_select);
+                } else if (stopRecord == 1) {
+                    mService.stopVideoRecording(cameraid1);
+                    mRecordTime1.setVisibility(View.GONE);
+                    mRecordButton1.setImageResource(R.drawable.record_select);
+
+                } else if (stopRecord == 2) {
+                    mService.stopVideoRecording(cameraid0);
+                    mRecordTime.setVisibility(View.GONE);
+                    mRecordButton.setImageResource(R.drawable.record_select);
+
+                    mService.stopVideoRecording(cameraid1);
+                    mRecordTime1.setVisibility(View.GONE);
+                    mRecordButton1.setImageResource(R.drawable.record_select);
+                }
+
             }
-            if (stopRecord == 0) {
-                mService.stopVideoRecording(cameraid0);
-                mRecordTime0.setVisibility(View.GONE);
-                mRecordButton0.setImageResource(R.drawable.record_select);
-            } else if (stopRecord == 1) {
-                mService.stopVideoRecording(cameraid1);
-                mRecordTime1.setVisibility(View.GONE);
-                mRecordButton1.setImageResource(R.drawable.record_select);
-            } else if (stopRecord == 2) {
-                mService.stopVideoRecording(cameraid0);
-                mRecordTime0.setVisibility(View.GONE);
-                mRecordButton0.setImageResource(R.drawable.record_select);
-                mService.stopVideoRecording(cameraid1);
-                mRecordTime1.setVisibility(View.GONE);
-                mRecordButton1.setImageResource(R.drawable.record_select);
+        };
+        IntentFilter filter = new IntentFilter("com.android.twovideotest");
+        registerReceiver(mReceiver, filter);
+        Log.d(TAG, "onCreate finish");
+    }
+
+    @Override
+    protected void onDestroy() {
+        // TODO Auto-generated method stub
+        Log.d(TAG, "##########onDestroy#############");
+        int cameraid = mService.isUVCCameraSonix(cameraid0);
+        if (cameraid == cameraid0) {
+            if (!getRecordingState(cameraid0) && !getRecordingState(cameraid1)) {
+                stopVideoService();
+            }
+        } else {
+            if (!getRecordingState(cameraid) && !getRecordingState(cameraid1)) {
+                stopVideoService();
             }
         }
-    };
+
+        unregisterReceiver(mReceiver);
+        super.onDestroy();
+    }
+
 
     private void initVideoView() {
+        TextureView textureView0 = (TextureView) findViewById(R.id.video0);
         textureView0.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
             @Override
             public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+                Log.d(TAG, "mVideo0 Available surface=" + surface);
+
                 mSurfaceTexture0 = surface;
-                if (mService != null) {
-                    int cameraid = mService.isUVCCameraSonix(cameraid0);
-                    Log.i("gh0st", "canmeraid:" + cameraid + ",width:" + width + ",height" + height);
-                    if (cameraid == cameraid0) {
-                        if (getRecordingState(cameraid0)) {
-                            //startVideoRecording();
-                            mService.startRender(cameraid0, surface);
-                            mRecordButton0.setImageResource(R.drawable.pause_select);
-                            mRecordTime0.setVisibility(View.VISIBLE);
-                        } else {
-                            startPreview(cameraid0, surface);
-                            mRecordButton0.setImageResource(R.drawable.record_select);
-                            mRecordTime0.setVisibility(View.GONE);
-                        }
+                int cameraid = mService.isUVCCameraSonix(cameraid0);
+                if (cameraid == cameraid0) {
+                    if (getRecordingState(cameraid0)) {
+                        //startVideoRecording();
+                        mService.startRender(cameraid0, surface);
+                        mRecordButton.setImageResource(R.drawable.pause_select);
+                        mRecordTime.setVisibility(View.VISIBLE);
+
+
                     } else {
-                        if (getRecordingState(cameraid)) {
-                            //startVideoRecording();
-                            startPreview(cameraid0, surface);
-                            //mService.startRender(cameraid0, surface);
-                            mRecordButton0.setImageResource(R.drawable.pause_select);
-                            mRecordTime0.setVisibility(View.VISIBLE);
-                        } else {
-                            startPreview(cameraid0, surface);
-                            mRecordButton0.setImageResource(R.drawable.record_select);
-                            mRecordTime0.setVisibility(View.GONE);
-                        }
+                        startPreview(cameraid0, surface);
+                        mRecordButton.setImageResource(R.drawable.record_select);
+                        mRecordTime.setVisibility(View.GONE);
+                    }
+                } else {
+                    if (getRecordingState(cameraid)) {
+                        //startVideoRecording();
+                        startPreview(cameraid0, surface);
+                        //mService.startRender(cameraid0, surface);
+                        mRecordButton.setImageResource(R.drawable.pause_select);
+                        mRecordTime.setVisibility(View.VISIBLE);
+
+
+                    } else {
+                        startPreview(cameraid0, surface);
+                        mRecordButton.setImageResource(R.drawable.record_select);
+                        mRecordTime.setVisibility(View.GONE);
                     }
                 }
+
+
             }
 
             @Override
@@ -331,46 +384,64 @@ public class TwoVideoActivity extends AppCompatActivity implements View.OnClickL
             public void onSurfaceTextureUpdated(SurfaceTexture surface) {
             }
         });
-        textureView0.addOnLayoutChangeListener(mLayoutListener);
-        textureView1.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
-            @Override
-            public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-                mSurfaceTexture1 = surface;
-                if (getRecordingState(cameraid1)) {
-                    //startVideoRecording();
-                    mService.startRender(cameraid1, surface);
-                    mRecordButton1.setImageResource(R.drawable.pause_select);
-                    mRecordTime1.setVisibility(View.VISIBLE);
-                } else {
-                    startPreview(cameraid1, surface);
-                    mRecordButton1.setImageResource(R.drawable.record_select);
-                    mRecordTime1.setVisibility(View.GONE);
+        if (mIsSupport2Video) {
+            TextureView textureView1 = (TextureView) findViewById(R.id.video1);
+            textureView1.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
+                @Override
+                public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+                    Log.d(TAG, "mVideo1 Available surface=" + surface);
+                    mSurfaceTexture1 = surface;
+
+
+                    if (getRecordingState(cameraid1)) {
+                        //startVideoRecording();
+                        mService.startRender(cameraid1, surface);
+                        mRecordButton1.setImageResource(R.drawable.pause_select);
+                        mRecordTime1.setVisibility(View.VISIBLE);
+
+
+                    } else {
+                        startPreview(cameraid1, surface);
+                        mRecordButton1.setImageResource(R.drawable.record_select);
+                        mRecordTime1.setVisibility(View.GONE);
+                    }
+
+
                 }
-            }
 
-            @Override
-            public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                Log.d(TAG, "onSurfaceTexture1 destroy");
-                mSurfaceTexture1 = null;
+                @Override
+                public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+                    Log.d(TAG, "onSurfaceTexture1 destroy");
+                    mSurfaceTexture1 = null;
 
-                if (getRecordingState(cameraid1)) {
-                    mService.stopRender(cameraid1);
+                    if (getRecordingState(cameraid1)) {
+                        mService.stopRender(cameraid1);
 
-                } else {
-                    mService.stopPreview(cameraid1);
-                    mService.closeCamera(cameraid1);
+                    } else {
+                        mService.stopPreview(cameraid1);
+                        mService.closeCamera(cameraid1);
+                    }
+
+                    return true;
                 }
-                return true;
-            }
 
-            @Override
-            public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-            }
+                @Override
+                public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+                }
 
-            @Override
-            public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-            }
-        });
-        textureView1.addOnLayoutChangeListener(mLayoutListener);
+                @Override
+                public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onInfo(MediaRecorder arg0, int arg1, int arg2) {
+
+    }
+
+    @Override
+    public void onError(MediaRecorder arg0, int arg1, int arg2) {
     }
 }

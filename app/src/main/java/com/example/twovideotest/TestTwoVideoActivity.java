@@ -15,8 +15,11 @@ import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
 
+/**
+ * 只是单纯的预览 没有录制功能
+ */
 public class TestTwoVideoActivity extends AppCompatActivity {
-    private static final String TAG = "gh0st TwoVideoActivity";
+    private static final String TAG = "gh0st2 TwoVideoActivity";
     private TextureView textureView6;
     private TextureView textureView7;
     private VideoService mService = null;
@@ -48,8 +51,8 @@ public class TestTwoVideoActivity extends AppCompatActivity {
     protected void onResume() {
         Log.d(TAG, "onResume ################");
         super.onResume();
-        initVideo6();
-        initVideo7();
+        //initVideo6();
+        //initVideo7();
         bindVideoService();
     }
 
@@ -97,6 +100,8 @@ public class TestTwoVideoActivity extends AppCompatActivity {
     private ServiceConnection mVideoServiceConn = new ServiceConnection() {
         public void onServiceConnected(ComponentName classname, IBinder obj) {
             mService = ((VideoService.LocalBinder) obj).getService();
+            mService.openCamera(cameraid6);
+            mService.openCamera(cameraid7);
         }
 
         public void onServiceDisconnected(ComponentName classname) {
@@ -105,7 +110,7 @@ public class TestTwoVideoActivity extends AppCompatActivity {
     };
 
     private void bindVideoService() {
-        L.d(TAG, "bindVideoService###############");
+        Log.d(TAG, "bindVideoService###############");
         Intent intent = new Intent(this, VideoService.class);
         bindService(intent, mVideoServiceConn, Context.BIND_AUTO_CREATE);
     }
@@ -130,7 +135,7 @@ public class TestTwoVideoActivity extends AppCompatActivity {
                 stopVideoService();
             }
         }
-        unregisterReceiver(mReceiver);
+        if (mReceiver != null) unregisterReceiver(mReceiver);
         super.onDestroy();
     }
 
@@ -154,7 +159,16 @@ public class TestTwoVideoActivity extends AppCompatActivity {
 
 
     private void initVideo6() {
-        textureView6.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
+        Log.i(TAG, "initVideo6 -1");
+        if (mService != null) {
+            Log.i(TAG, "initVideo6 0");
+            mService.stopPreview(cameraid6);
+            Log.i(TAG, "initVideo6 1");
+            mService.closeCamera(cameraid6);
+            Log.i(TAG, "initVideo6 2");
+            startPreview(cameraid6, textureView6.getSurfaceTexture());
+        }
+/*        textureView6.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
             @Override
             public void onSurfaceTextureAvailable(final SurfaceTexture surface, int width, int height) {
                 if (mService != null) {
@@ -177,33 +191,40 @@ public class TestTwoVideoActivity extends AppCompatActivity {
             @Override
             public void onSurfaceTextureUpdated(SurfaceTexture surface) {
             }
-        });
+        });*/
     }
 
     private void initVideo7() {
-        if (textureView7 != null)
-            textureView7.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
-                @Override
-                public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-                    startPreview(cameraid7, surface);
-                }
+        if (mService != null) {
+            Log.i(TAG, "initVideo7 0");
+            mService.stopPreview(cameraid7);
+            Log.i(TAG, "initVideo7 1");
+            mService.closeCamera(cameraid7);
+            Log.i(TAG, "initVideo7 2");
+            startPreview(cameraid7, textureView7.getSurfaceTexture());
+        }
+  /*      textureView7.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
+            @Override
+            public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+                startPreview(cameraid7, surface);
+            }
 
-                @Override
-                public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                    Log.d(TAG, "onSurfaceTexture1 destroy");
-                    mService.stopPreview(cameraid7);
-                    mService.closeCamera(cameraid7);
-                    return true;
-                }
+            @Override
+            public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+                Log.d(TAG, "onSurfaceTexture1 destroy");
+                mService.stopPreview(cameraid7);
+                mService.closeCamera(cameraid7);
+                return true;
+            }
 
-                @Override
-                public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-                }
+            @Override
+            public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+            }
 
-                @Override
-                public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-                }
-            });
+            @Override
+            public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+            }
+        });*/
     }
 
     private void initVideoView() {

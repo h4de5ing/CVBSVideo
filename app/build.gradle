@@ -14,8 +14,8 @@ android {
         applicationId "com.example.twovideotest2"
         minSdkVersion 21
         targetSdkVersion 23
-        versionCode 1
-        versionName "1.1"
+        versionCode 2
+        versionName "1.2"
         signingConfig signingConfigs.release
     }
     buildTypes {
@@ -34,4 +34,15 @@ android {
 
 dependencies {
     compile 'com.android.support:appcompat-v7:23.0.0'
+}
+task app(dependsOn: 'assembleDebug') << {
+    def today = new Date().format('yyyyMMddHHmmss')
+    def id = android.defaultConfig.applicationId
+    def prex = id.substring(id.lastIndexOf(".") + 1)
+    copy {
+        from('build/outputs/apk/debug')
+        into("\\\\192.168.67.13\\Image\\E9631\\Apk\\debug_apk")
+        include('*.apk')
+        rename('app-', "$prex" + "-V" + android.defaultConfig.versionName + "-" + today + "-")
+    }
 }

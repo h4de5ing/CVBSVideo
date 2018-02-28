@@ -2,7 +2,6 @@ package com.example.twovideotest;
 
 import android.annotation.SuppressLint;
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -38,7 +37,7 @@ public class VideoService extends Service implements
         MediaRecorder.OnErrorListener, ServiceData,
         MediaRecorder.OnInfoListener {
 
-    private static final String TAG = "gh0st";
+    private static final String TAG = "gh0st VideoService";
 
     private static final int SAVE_VIDEO = 8;
     private static final int MAX_NUM_OF_CAMERAS = 8;
@@ -59,7 +58,7 @@ public class VideoService extends Service implements
     private boolean[] mRecorderAudio;
     private SurfaceTexture[] mSurfaceTexture;
     private final CameraErrorCallback mErrorCallback = new CameraErrorCallback();
-    private Receiver mReceiver;
+    //private Receiver mReceiver;
     private Context mContext;
     private RemoteCallbackList<IVideoCallback> mCallbackList = new RemoteCallbackList<IVideoCallback>();
     private int mCameraUVC = -1;
@@ -276,7 +275,6 @@ public class VideoService extends Service implements
     @Override
     public void onError(MediaRecorder mr, int what, int extra) {
         Log.e(TAG, "MediaRecorder error. what=" + what + ". extra=" + extra);
-
     }
 
     @Override
@@ -289,7 +287,7 @@ public class VideoService extends Service implements
         }
     }
 
-    private int openCamera(int index) {
+    public int openCamera(int index) {
         if (mCameraDevice[index] != null) {
             Log.d(TAG, "openCamera222 index=" + index);
             return 0;
@@ -352,7 +350,7 @@ public class VideoService extends Service implements
         } else {
             if (mPreviewing[index]) {
                 try {
-                    Thread.sleep(160);
+                    Thread.sleep(300);
                     mCameraDevice[index].setPreviewTexture(surfaceTexture);
                 } catch (IOException ex) {
                     mPreviewing[index] = false;
@@ -372,18 +370,16 @@ public class VideoService extends Service implements
             }*/
                 try {
                     //mCameraDevice[index].setDisplayOrientation(180);
-                    mCameraDevice[index].setPreviewTexture(surfaceTexture);
                     mCameraDevice[index].startPreview();
-                    Thread.sleep(160);
-                    //Thread.currentThread().sleep(160);
+                    SystemClock.sleep(200);
+                    mCameraDevice[index].setPreviewTexture(surfaceTexture);
                     mPreviewing[index] = true;
                 } catch (IOException ex) {
                     mPreviewing[index] = false;
                     //closeCamera();
                     Log.e(TAG, "startPreview failed", ex);
                     return FAIL;
-                }
-                catch (InterruptedException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -461,7 +457,6 @@ public class VideoService extends Service implements
         if (mRecorderAudio[index]) {
             mMediaRecorder[index].setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
         }
-
         mMediaRecorder[index].setVideoSource(MediaRecorder.VideoSource.CAMERA);
         mMediaRecorder[index].setOutputFormat(mOutFormat[index]);
         mMediaRecorder[index].setVideoFrameRate(mFrameRate[index]);
@@ -477,13 +472,10 @@ public class VideoService extends Service implements
             List<Size> sizes = null;
             sizes = parameters.getSupportedVideoSizes();
             Iterator<Size> it;
-            if ((index >= 4) && (index <= 7)) //cvbs must be 720*480 or 720*576
-            {
-
+            if ((index >= 4) && (index <= 7)) { //cvbs must be 720*480 or 720*576
                 if (sizes == null) {
                     mMediaRecorder[index].setVideoSize(720, 480);
                 } else { // Driver supports separates outputs for preview and video.
-
                     it = sizes.iterator();
                     Size size = it.next();
                     Log.d(TAG, "size.width=" + size.width + " size.height= " + size.height);
@@ -571,6 +563,7 @@ public class VideoService extends Service implements
      * 返回值和index不一样 表示是uvccamera
      * 在camera open之后有效，表示状态不可用
      */
+    @Deprecated
     public int isUVCCameraSonix(int index) {
         Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
         Camera.getCameraInfo(index, cameraInfo);
@@ -704,7 +697,14 @@ public class VideoService extends Service implements
     }
 
     void setPath() {
-        VideoStorage.setPath(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + Environment.DIRECTORY_DCIM + File.separator);
+        //  扩展sd卡目录 /mnt/media_rw/card
+        //VideoStorage.setPath(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + Environment.DIRECTORY_DCIM + File.separator);
+        String path = VideoStorage.TFCardPath + Environment.DIRECTORY_DCIM + File.separator;
+        if (!new File(path).exists()) {
+            new File(path).mkdir();
+        }
+        VideoStorage.setPath(path);
+
     }
 
     @Override
@@ -714,24 +714,23 @@ public class VideoService extends Service implements
         mContext = this;
         setPath();
         initVideoMemembers();
-        /*IntentFilter filter = new IntentFilter("android.hardware.tvd.state.change");
+/*        IntentFilter filter = new IntentFilter("android.hardware.tvd.state.change");
         mReceiver = new Receiver();
         registerReceiver(mReceiver, filter);*/
     }
 
-    private class Receiver extends BroadcastReceiver {
+ /*   private class Receiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-
-            //Log.d(TAG, "action=" + action);
-            if (action.equals("android.hardware.tvd.state.change")) {
+            Log.d(TAG, "action=" + action);
+            if ("android.hardware.tvd.state.change".equals(action)) {
                 int cameraid = intent.getIntExtra("index", -1);
                 int status = intent.getIntExtra("state", 0);
-                //Log.d(TAG, "cameraid=" + cameraid + " status=" + status);
+                Log.d(TAG, "cameraid=" + cameraid + " status=" + status);
             }
         }
-    }
+    }*/
 
     private void stopPreview() {
         stopPreview(0);
@@ -741,7 +740,9 @@ public class VideoService extends Service implements
     @Override
     public void onDestroy() {
         super.onDestroy();
-        //unregisterReceiver(mReceiver);
+/*        if (mReceiver != null) {
+            unregisterReceiver(mReceiver);
+        }*/
         Log.d(TAG, "videService onDestroy###############");
     }
 
