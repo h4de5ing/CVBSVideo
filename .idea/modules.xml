@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/AndroidSouce.iml" filepath="$PROJECT_DIR$/AndroidSouce.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CVBSVideo.iml" filepath="$PROJECT_DIR$/CVBSVideo.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rearvideo/rearvideo.iml" filepath="$PROJECT_DIR$/rearvideo/rearvideo.iml" />
     </modules>
   </component>
 </project>
