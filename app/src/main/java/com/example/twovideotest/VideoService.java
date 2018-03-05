@@ -33,9 +33,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-public class VideoService extends Service implements
-        MediaRecorder.OnErrorListener, ServiceData,
-        MediaRecorder.OnInfoListener {
+public class VideoService extends Service implements MediaRecorder.OnErrorListener, ServiceData, MediaRecorder.OnInfoListener {
 
     private static final String TAG = "gh0st VideoService";
 
@@ -57,7 +55,7 @@ public class VideoService extends Service implements
     private long[] mRecordingStartTime;
     private boolean[] mRecorderAudio;
     private SurfaceTexture[] mSurfaceTexture;
-    private final CameraErrorCallback mErrorCallback = new CameraErrorCallback();
+    //private final CameraErrorCallback mErrorCallback = new CameraErrorCallback();
     //private Receiver mReceiver;
     private Context mContext;
     private RemoteCallbackList<IVideoCallback> mCallbackList = new RemoteCallbackList<IVideoCallback>();
@@ -99,7 +97,7 @@ public class VideoService extends Service implements
             mFrameRate[i] = 30;
             mRecorderBitRate[i] = 6000000;//6M
             mRecorderAudio[i] = false;
-            mVideoFilename[i] = new String("/mnt/sdcard/record" + "i" + ".mp4");
+            //mVideoFilename[i] = new String("/mnt/sdcard/record" + "i" + ".mp4");
         }
     }
 
@@ -187,8 +185,7 @@ public class VideoService extends Service implements
     }
 
 
-    class CameraErrorCallback
-            implements Camera.ErrorCallback {
+    class CameraErrorCallback implements Camera.ErrorCallback {
         private static final String TAG = "CameraErrorCallback";
 
         @Override
@@ -361,13 +358,7 @@ public class VideoService extends Service implements
                     e.printStackTrace();
                 }
             } else {
-                Log.d(TAG, "mCameraDevice " + mCameraDevice + " mErrorCallback =" + mErrorCallback);
-/*            mCameraDevice[index].setErrorCallback(mErrorCallback);
-            Parameters param = mCameraDevice[index].getParameters();
-            List<Size> sizes = param.getSupportedPreviewSizes();
-            for (Size size : sizes) {
-                Log.d(TAG, "size.width=" + size.width + " height" + size.height);
-            }*/
+                Log.d(TAG, "mCameraDevice not previewing");
                 try {
                     //mCameraDevice[index].setDisplayOrientation(180);
                     mCameraDevice[index].startPreview();
@@ -407,9 +398,9 @@ public class VideoService extends Service implements
         sendBroadcast(i);
     }
 
-    private String createName(long dateTaken) {
+    private String createName(int index, long dateTaken) {
         Date date = new Date(dateTaken);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("'VID'_yyyyMMdd_HHmmss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("'VID'_yyyyMMdd_HHmmss_" + index);
         return dateFormat.format(date);
     }
 
@@ -428,7 +419,7 @@ public class VideoService extends Service implements
 
     private String generateVideoFilename(int index, int outputFileFormat) {
         long dateTaken = System.currentTimeMillis();
-        String title = createName(dateTaken);
+        String title = createName(index, dateTaken);
         // Used when emailing.
         String filename = title + VideoStorage.convertOutputFormatToFileExt(outputFileFormat);
         String mime = VideoStorage.convertOutputFormatToMimeType(outputFileFormat);
@@ -458,6 +449,7 @@ public class VideoService extends Service implements
             mMediaRecorder[index].setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
         }
         mMediaRecorder[index].setVideoSource(MediaRecorder.VideoSource.CAMERA);
+        //mMediaRecorder[index].setAudioSource(MediaRecorder.AudioSource.MIC);
         mMediaRecorder[index].setOutputFormat(mOutFormat[index]);
         mMediaRecorder[index].setVideoFrameRate(mFrameRate[index]);
         Parameters parameters = null;
@@ -510,17 +502,16 @@ public class VideoService extends Service implements
             Log.d(TAG, "video set default size.width=" + mVideoWidth[index] + " size.height= " + mVideoHeight[index]);
             mMediaRecorder[index].setVideoSize(mVideoWidth[index], mVideoHeight[index]);
         }
-
-
         mMediaRecorder[index].setVideoEncodingBitRate(mRecorderBitRate[index]);
         mMediaRecorder[index].setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         if (mRecorderAudio[index]) {
-            //mMediaRecorder[index].setAudioEncodingBitRate(mProfile[index].audioBitRate);
+            //mMediaRecorder[index].setAudioSource(MediaRecorder.AudioSource.MIC);
+            //mMediaRecorder[index].setAudioEncodingBitRate(8);
             //mMediaRecorder[index].setAudioChannels(mProfile[index].audioChannels);
             //mMediaRecorder[index].setAudioSamplingRate(mProfile[index].audioSampleRate);
             //mMediaRecorder[index].setAudioEncoder(mProfile[index].audioCodec);
-            // Log.d(TAG,"mProfile.videoFrameWidth, mProfile.videoFrameHeight=" + mProfile[index].videoFrameWidth +  "*" + mProfile[index].videoFrameHeight);
-            // mMediaRecorder[index].setVideoSize(mProfile[index].videoFrameWidth, mProfile[index].videoFrameHeight);
+            //Log.d(TAG, "mProfile.videoFrameWidth, mProfile.videoFrameHeight=" + mProfile[index].videoFrameWidth + "*" + mProfile[index].videoFrameHeight);
+            //mMediaRecorder[index].setVideoSize(mProfile[index].videoFrameWidth, mProfile[index].videoFrameHeight);
         }
         mVideoFilename[index] = generateVideoFilename(index, mOutFormat[index]);
         Log.d(TAG, "mVideoFilename= " + mVideoFilename[index]);
@@ -528,7 +519,7 @@ public class VideoService extends Service implements
         try {
             mMediaRecorder[index].prepare();
         } catch (IOException e) {
-            Log.e(TAG, "prepare failed for " + mVideoFilename, e);
+            Log.e(TAG, "prepare failed for " + mVideoFilename.toString(), e);
             releaseMediaRecorder(index);
             throw new RuntimeException(e);
         }

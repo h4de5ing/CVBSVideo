@@ -22,6 +22,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <service android:name=".VideoService" />
 
         <activity
@@ -35,6 +36,8 @@
             android:screenOrientation="landscape" />
 
         <service android:name=".killSelfService" />
+
+        <activity android:name=".SettingActivity"></activity>
     </application>
 
 </manifest>

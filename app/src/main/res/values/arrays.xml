@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="zhi">
+        <item>NTSC</item>
+        <item>PAL</item>
+    </string-array>
+</resources>

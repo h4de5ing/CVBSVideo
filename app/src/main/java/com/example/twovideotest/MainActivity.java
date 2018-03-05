@@ -25,9 +25,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 
@@ -193,6 +195,13 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
         Log.d(TAG, "onResume ################");
         super.onResume();
         bindVideoService();
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                initVideo6();
+                initVideo7();
+            }
+        }, 100);
     }
 
     @Override
@@ -209,7 +218,9 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
     }
 
     private void startPreview(int cameraId, SurfaceTexture surfaceTexture) {
+        Log.i(TAG, "startPreview !=null ");
         if (mService != null && (surfaceTexture != null)) {
+            Log.i(TAG, "mService !=null ");
             mService.startPreview(cameraId, surfaceTexture);
         }
     }
@@ -246,6 +257,8 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
         Log.d(TAG, "onCreate start");
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
+        setZhi(path, Constacts.zhi);
+        setZhi(path2, Constacts.zhi);
         startVideoService();
         mRecordButton = (ImageButton) findViewById(R.id.recordbutton);
         mRecordTime = (TextView) findViewById(R.id.recording_time);
@@ -258,7 +271,7 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
             layout.setVisibility(View.GONE);
         mRecordButton.setOnClickListener(this);
         mRecordButton1.setOnClickListener(this);
-        initVideoView();
+        //initVideoView();
         mReceiver = new BroadcastReceiver() {
 
             @Override
@@ -311,7 +324,7 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
         mTvReceiver = new TvStateReceiver();
         registerReceiver(mTvReceiver, new IntentFilter(videoStateChange));
         Log.d(TAG, "onCreate finish");
-        initTask();
+        //initTask();
     }
 
     private static final String tvState = "/sys/devices/virtual/switch/tvd_signal/state";
@@ -323,7 +336,7 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
             public void run() {
                 currentstate = readState();
             }
-        }, 500);
+        }, 1000);
        /*    new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
@@ -409,29 +422,18 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
             if (videoStateChange.equals(action)) {
                 int cameraid = intent.getIntExtra("index", -1);
                 int status = intent.getIntExtra("state", 0);
-                Log.d(TAG, "cameraid=" + cameraid + " status=" + status);
-                if (currentstate == 0 && currentstate != status && status == 1) {
-                    Log.i(TAG, "重启app");
-                    RestartAPPTool.restartAPP(MainActivity.this, 0);
-                }
-/*                if (status == 1) {
-                    if (cameraid == 6) {
-                        mHandler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                initVideo6();
-                            }
-                        }, 1000);
-
-                    } else if (cameraid == 7) {
-                        mHandler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                initVideo7();
-                            }
-                        }, 2000);
-                    }
+                Log.d(TAG, "cameraid=" + cameraid + " status=" + status + " currentstate " + currentstate);
+/*                if (currentstate == 0 && currentstate != status && status == 1) {
+                    //Log.i(TAG, "重启app");
+                    //RestartAPPTool.restartAPP(MainActivity.this, 0);
                 }*/
+                if (status == 1) {
+                    if (cameraid == 6) {
+                        initVideo6();
+                    } else if (cameraid == 7) {
+                        initVideo7();
+                    }
+                }
             }
         }
     }
@@ -453,7 +455,9 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
     private TextureView textureView7;
 
     private void initVideoView() {
+        Log.i(TAG, "initVideoView");
         if (textureView6 != null) {
+            Log.i(TAG, "textureView6 !=null ");
             textureView6.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
                 @Override
                 public void onSurfaceTextureAvailable(final SurfaceTexture surface, int width, int height) {
@@ -508,6 +512,7 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
     }
 
     private void initVideo6() {
+        Log.i(TAG, "initVideo6 mService == null   " + (mService == null));
         if (mService != null) {
             //stopPreview(cameraid6);
             //closeCamera(cameraid6);
@@ -545,7 +550,7 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
 
     private void initVideo7() {
         if (mService != null) {
-            stopPreview(cameraid7);
+            //stopPreview(cameraid7);
             //closeCamera(cameraid7);
             startPreview(cameraid7, textureView7.getSurfaceTexture());
       /*      textureView7 = (TextureView) findViewById(R.id.video1);
@@ -587,5 +592,21 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
     @Override
     public void onError(MediaRecorder arg0, int arg1, int arg2) {
 
+    }
+
+    String path = "/sys/devices/soc.0/1c33000.tvd2/tvd2_attr/tvd_system";
+    String path2 = "/sys/devices/soc.0/1c34000.tvd3/tvd3_attr/tvd_system";
+
+    private void setZhi(String path, int value) {
+        //String path = "/sdcard/txt.txt";
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(new File(path)));
+            Log.i("gh0st", "path:" + path + ",write:" + value);
+            writer.write("#" + value);
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

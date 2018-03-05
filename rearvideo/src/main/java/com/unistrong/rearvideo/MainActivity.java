@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         if (mCamera == null) {
             try {
                 mCamera = Camera.open(cameraid6);
-                Camera.Parameters parameters = mCamera.getParameters();
+                //Camera.Parameters parameters = mCamera.getParameters();
                 //parameters.setPreviewFormat(ImageFormat.NV21);
                 Log.i(TAG, "camera open");
             } catch (Exception e) {

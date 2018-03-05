@@ -24,7 +24,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:22.1.0'
 }
-task rear(dependsOn: 'assembleDebug') << {
+task rearvideo(dependsOn: 'assembleDebug') << {
     def today = new Date().format('yyyyMMddHHmmss')
     def id = android.defaultConfig.applicationId
     //def prex = id.substring(id.lastIndexOf(".") + 1)
