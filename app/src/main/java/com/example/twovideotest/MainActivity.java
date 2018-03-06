@@ -18,18 +18,15 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
-import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 
 
@@ -163,9 +160,9 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
     private ServiceConnection mVideoServiceConn = new ServiceConnection() {
         public void onServiceConnected(ComponentName classname, IBinder obj) {
             mService = ((VideoService.LocalBinder) obj).getService();
+            initVideo6();
+            initVideo7();
             if (mService != null) {
-                mService.openCamera(cameraid6);
-                mService.openCamera(cameraid7);
                 mService.registerCallback(mVideoCallback);
             }
         }
@@ -195,13 +192,7 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
         Log.d(TAG, "onResume ################");
         super.onResume();
         bindVideoService();
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                initVideo6();
-                initVideo7();
-            }
-        }, 100);
+        initVideoView();
     }
 
     @Override
@@ -255,10 +246,10 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate start");
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        //requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
-        setZhi(path, Constacts.zhi);
-        setZhi(path2, Constacts.zhi);
+        Constacts.setZhi(Constacts.path, Constacts.zhi);
+        Constacts.setZhi(Constacts.path2, Constacts.zhi);
         startVideoService();
         mRecordButton = (ImageButton) findViewById(R.id.recordbutton);
         mRecordTime = (TextView) findViewById(R.id.recording_time);
@@ -417,16 +408,16 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
     private class TvStateReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
+         /*   String action = intent.getAction();
             //Log.d(TAG, "action=" + action);
             if (videoStateChange.equals(action)) {
                 int cameraid = intent.getIntExtra("index", -1);
                 int status = intent.getIntExtra("state", 0);
                 Log.d(TAG, "cameraid=" + cameraid + " status=" + status + " currentstate " + currentstate);
-/*                if (currentstate == 0 && currentstate != status && status == 1) {
+                if (currentstate == 0 && currentstate != status && status == 1) {
                     //Log.i(TAG, "重启app");
                     //RestartAPPTool.restartAPP(MainActivity.this, 0);
-                }*/
+                }
                 if (status == 1) {
                     if (cameraid == 6) {
                         initVideo6();
@@ -434,7 +425,7 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
                         initVideo7();
                     }
                 }
-            }
+            }*/
         }
     }
 
@@ -456,59 +447,54 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
 
     private void initVideoView() {
         Log.i(TAG, "initVideoView");
-        if (textureView6 != null) {
-            Log.i(TAG, "textureView6 !=null ");
-            textureView6.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
-                @Override
-                public void onSurfaceTextureAvailable(final SurfaceTexture surface, int width, int height) {
-                    startPreview(cameraid6, surface);
-                }
+        textureView6.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
+            @Override
+            public void onSurfaceTextureAvailable(final SurfaceTexture surface, int width, int height) {
+                startPreview(cameraid6, surface);
+            }
 
-                @Override
-                public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                    Log.d(TAG, "onSurfaceTexture0  Destroyed ");
-                    if (mService != null) {
-                        mService.stopPreview(cameraid6);
-                        mService.closeCamera(cameraid6);
-                    }
-                    return true;
+            @Override
+            public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+                Log.d(TAG, "onSurfaceTexture0  Destroyed ");
+                if (mService != null) {
+                    mService.stopPreview(cameraid6);
+                    mService.closeCamera(cameraid6);
                 }
+                return true;
+            }
 
-                @Override
-                public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-                }
+            @Override
+            public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+            }
 
-                @Override
-                public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-                }
-            });
-        }
-        if (textureView7 != null) {
-            textureView7.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
-                @Override
-                public void onSurfaceTextureAvailable(final SurfaceTexture surface, int width, int height) {
-                    startPreview(cameraid7, surface);
-                }
+            @Override
+            public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+            }
+        });
+        textureView7.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
+            @Override
+            public void onSurfaceTextureAvailable(final SurfaceTexture surface, int width, int height) {
+                startPreview(cameraid7, surface);
+            }
 
-                @Override
-                public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                    Log.d(TAG, "onSurfaceTexture1 destroy");
-                    if (mService != null) {
-                        mService.stopPreview(cameraid7);
-                        mService.closeCamera(cameraid7);
-                    }
-                    return true;
+            @Override
+            public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+                Log.d(TAG, "onSurfaceTexture1 destroy");
+                if (mService != null) {
+                    mService.stopPreview(cameraid7);
+                    mService.closeCamera(cameraid7);
                 }
+                return true;
+            }
 
-                @Override
-                public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-                }
+            @Override
+            public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+            }
 
-                @Override
-                public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-                }
-            });
-        }
+            @Override
+            public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+            }
+        });
     }
 
     private void initVideo6() {
@@ -517,34 +503,6 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
             //stopPreview(cameraid6);
             //closeCamera(cameraid6);
             startPreview(cameraid6, textureView6.getSurfaceTexture());
-    /*        textureView6 = (TextureView) findViewById(R.id.video0);
-            if (textureView6 != null) {
-                textureView6.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
-                    @Override
-                    public void onSurfaceTextureAvailable(final SurfaceTexture surface, int width, int height) {
-                        Log.d(TAG, "textureView6 onSurfaceTextureAvailable ");
-                        startPreview(cameraid6, surface);
-                    }
-
-                    @Override
-                    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                        Log.d(TAG, "textureView6 onSurfaceTextureDestroyed ");
-                        if (mService != null) {
-                            mService.stopPreview(cameraid6);
-                            mService.closeCamera(cameraid6);
-                        }
-                        return true;
-                    }
-
-                    @Override
-                    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-                    }
-
-                    @Override
-                    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-                    }
-                });
-            }*/
         }
     }
 
@@ -553,34 +511,6 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
             //stopPreview(cameraid7);
             //closeCamera(cameraid7);
             startPreview(cameraid7, textureView7.getSurfaceTexture());
-      /*      textureView7 = (TextureView) findViewById(R.id.video1);
-            if (textureView7 != null) {
-                textureView7.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
-                    @Override
-                    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-                        Log.d(TAG, "textureView7 onSurfaceTextureAvailable ");
-                        startPreview(cameraid7, surface);
-                    }
-
-                    @Override
-                    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                        Log.d(TAG, "textureView7 onSurfaceTextureAvailable ");
-                        if (mService != null) {
-                            mService.stopPreview(cameraid7);
-                            mService.closeCamera(cameraid7);
-                        }
-                        return true;
-                    }
-
-                    @Override
-                    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-                    }
-
-                    @Override
-                    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-                    }
-                });
-            }*/
         }
     }
 
@@ -592,21 +522,5 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
     @Override
     public void onError(MediaRecorder arg0, int arg1, int arg2) {
 
-    }
-
-    String path = "/sys/devices/soc.0/1c33000.tvd2/tvd2_attr/tvd_system";
-    String path2 = "/sys/devices/soc.0/1c34000.tvd3/tvd3_attr/tvd_system";
-
-    private void setZhi(String path, int value) {
-        //String path = "/sdcard/txt.txt";
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(new File(path)));
-            Log.i("gh0st", "path:" + path + ",write:" + value);
-            writer.write("#" + value);
-            writer.flush();
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

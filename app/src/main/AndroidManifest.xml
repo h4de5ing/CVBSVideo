@@ -26,8 +26,13 @@
         <service android:name=".VideoService" />
 
         <activity
-            android:name=".MainActivity"
-            android:screenOrientation="landscape" />
+            android:name="com.example.twovideotest.MainActivity"
+            android:exported="true"
+            android:screenOrientation="landscape">
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".TestTwoVideoActivity"
             android:screenOrientation="landscape" />
@@ -37,7 +42,7 @@
 
         <service android:name=".killSelfService" />
 
-        <activity android:name=".SettingActivity"></activity>
+        <activity android:name=".SettingActivity" />
     </application>
 
 </manifest>

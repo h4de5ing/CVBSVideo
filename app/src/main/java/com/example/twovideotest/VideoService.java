@@ -362,7 +362,7 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
                 try {
                     //mCameraDevice[index].setDisplayOrientation(180);
                     mCameraDevice[index].startPreview();
-                    SystemClock.sleep(200);
+                    SystemClock.sleep(300);
                     mCameraDevice[index].setPreviewTexture(surfaceTexture);
                     mPreviewing[index] = true;
                 } catch (IOException ex) {

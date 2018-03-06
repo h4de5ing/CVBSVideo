@@ -34,30 +34,14 @@ public class PermissionActivity extends AppCompatActivity {
         Spinner spinner6 = (Spinner) findViewById(R.id.sp_video6);
         final ArrayAdapter adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, getResources().getStringArray(R.array.zhi));
         spinner6.setAdapter(adapter);
-        Spinner spinner7 = (Spinner) findViewById(R.id.sp_video7);
-        spinner7.setAdapter(adapter);
         int video6 = (int) SPUtils.getSp(PermissionActivity.this, "video6", 0);
-        int video7 = (int) SPUtils.getSp(PermissionActivity.this, "video7", 0);
         spinner6.setSelection(video6);
-        spinner7.setSelection(video7);
         spinner6.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 Log.i("gh0st", "video6" + adapterView.getAdapter().getItem(i) + ", " + adapterView.getItemIdAtPosition(i));
                 SPUtils.setSP(PermissionActivity.this, "video6", (int) adapterView.getItemIdAtPosition(i));
                 Constacts.zhi = (int) adapterView.getItemIdAtPosition(i);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-        spinner7.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.i("gh0st", "vidoe7 " + adapterView.getAdapter().getItem(i) + ", " + adapterView.getItemIdAtPosition(i));
-                SPUtils.setSP(PermissionActivity.this, "video7", (int) adapterView.getItemIdAtPosition(i));
             }
 
             @Override
