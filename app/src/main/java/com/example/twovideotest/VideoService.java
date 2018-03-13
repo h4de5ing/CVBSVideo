@@ -347,15 +347,13 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
         } else {
             if (mPreviewing[index]) {
                 try {
-                    Thread.sleep(300);
+                    SystemClock.sleep(300);
                     mCameraDevice[index].setPreviewTexture(surfaceTexture);
                 } catch (IOException ex) {
                     mPreviewing[index] = false;
                     //closeCamera();
                     Log.e(TAG, "startPreview failed", ex);
                     return FAIL;
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
             } else {
                 Log.d(TAG, "mCameraDevice not previewing");
@@ -690,12 +688,11 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
     void setPath() {
         //  扩展sd卡目录 /mnt/media_rw/card
         //VideoStorage.setPath(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + Environment.DIRECTORY_DCIM + File.separator);
-        String path = VideoStorage.TFCardPath + Environment.DIRECTORY_DCIM + File.separator;
+        String path = VideoStorage.TFCardPath + Environment.DIRECTORY_DCIM;
         if (!new File(path).exists()) {
             new File(path).mkdir();
         }
         VideoStorage.setPath(path);
-
     }
 
     @Override
