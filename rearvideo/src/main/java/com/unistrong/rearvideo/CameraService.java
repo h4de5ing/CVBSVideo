@@ -33,7 +33,7 @@ public class CameraService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        initTask();
+        //initTask();
         initCamera();
         IntentFilter filter = new IntentFilter("android.hardware.tvd.state.change");
         mReceiver = new Receiver();
@@ -56,7 +56,7 @@ public class CameraService extends Service {
     private class Receiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
+/*            String action = intent.getAction();
             if ("android.hardware.tvd.state.change".equals(action)) {
                 int cameraid = intent.getIntExtra("index", -1);
                 int status = intent.getIntExtra("state", 0);
@@ -65,7 +65,7 @@ public class CameraService extends Service {
                     if (status == 1) startServiceActivity();
                     else stopServiceActivity();
                 }
-            }
+            }*/
         }
     }
 
@@ -146,6 +146,13 @@ public class CameraService extends Service {
         } catch (Exception e) {
             Log.d(TAG, "stopPreview camera is not available");
         }*/
+    }
+
+    public void closeCamera() {
+        if (mCamera != null) {
+            mCamera.release();
+            mCamera = null;
+        }
     }
 
     private final IBinder mBinder = new LocalBinder();
