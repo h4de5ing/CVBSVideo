@@ -100,7 +100,6 @@ public class VideoStorage {
     private static void deleteVideoFile(ContentResolver resolver, int format) {
         Uri uri = Uri.parse(VIDEO_BASE_URI);
         int deleteId = -1;
-
         deleteId = queryOldVideoFile(resolver, format);
         if (deleteId > 0) {
             resolver.delete(uri, Video.Media._ID + "=?", new String[]{Integer.toString(deleteId)});

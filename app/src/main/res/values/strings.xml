@@ -2,4 +2,5 @@
     <string name="app_name">multivideo</string>
     <string name="app_name_setting">multivideo standard</string>
     <string name="time">time</string>
+    <string name="title_activity_zhi">ZhiActivity</string>
 </resources>

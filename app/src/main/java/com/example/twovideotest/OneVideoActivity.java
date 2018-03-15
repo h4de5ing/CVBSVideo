@@ -32,12 +32,6 @@ public class OneVideoActivity extends AppCompatActivity implements MediaRecorder
     private SurfaceTexture mSurfaceTexture0;
     private TextView mRecordTime;
     private BroadcastReceiver mReceiver;
-    private static final int VIDEO0 = 0;
-    private static final int VIDEO1 = 1;
-    private static final int VIDEO2 = 2;
-    private static final int VIDEO3 = 3;
-    private static final int VIDEO4 = 4;
-    private static final int VIDEO5 = 5;
     private static final int VIDEO6 = 6;
     private static final int VIDEO7 = 7;
 

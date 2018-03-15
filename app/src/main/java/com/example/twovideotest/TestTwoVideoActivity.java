@@ -15,6 +15,9 @@ import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
 
+import com.example.twovideotest.R;
+import com.example.twovideotest.VideoService;
+
 /**
  * 只是单纯的预览 没有录制功能
  */
