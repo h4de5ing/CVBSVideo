@@ -178,7 +178,7 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
         }
     };
 
-   public class LocalBinder extends Binder {
+    public class LocalBinder extends Binder {
         public VideoService getService() {
             return VideoService.this;
         }
@@ -336,7 +336,7 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
                 try {
                     //mCameraDevice[index].setDisplayOrientation(180);
                     mCameraDevice[index].startPreview();
-                    SystemClock.sleep(300);
+                    SystemClock.sleep(500);
                     mCameraDevice[index].setPreviewTexture(surfaceTexture);
                     mPreviewing[index] = true;
                 } catch (IOException ex) {
@@ -511,15 +511,19 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
     }
 
     private void releaseMediaRecorder(int index) {
-        Log.v(TAG, "Releasing media recorder.");
-        if (mMediaRecorder[index] != null) {
-            cleanupEmptyFile(index);
-            mMediaRecorder[index].reset();
-            mMediaRecorder[index].release();
-            mMediaRecorder[index] = null;
-            mCameraDevice[index].lock();
+        try {
+            Log.v(TAG, "Releasing media recorder.");
+            if (mMediaRecorder[index] != null) {
+                cleanupEmptyFile(index);
+                mMediaRecorder[index].reset();
+                mMediaRecorder[index].release();
+                mMediaRecorder[index] = null;
+                mCameraDevice[index].lock();
+            }
+            mVideoFilename[index] = null;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        mVideoFilename[index] = null;
     }
 
     /*

@@ -199,7 +199,22 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
     protected void onPause() {
         Log.d(TAG, "onPause ################");
         super.onPause();
-        unbindVideoService();
+        try {
+            if (getRecordingState(cameraid6)) {
+                mService.stopVideoRecording(cameraid6);
+                mRecordTime.setVisibility(View.GONE);
+                mRecordButton.setImageResource(R.drawable.record_select);
+            }
+            if (getRecordingState(cameraid7)) {
+                mService.stopVideoRecording(cameraid7);
+                mRecordTime1.setVisibility(View.GONE);
+                mRecordButton1.setImageResource(R.drawable.record_select);
+            }
+            unbindVideoService();
+            stopVideoService();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private boolean getRecordingState(int index) {
