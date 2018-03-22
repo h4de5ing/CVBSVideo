@@ -23,11 +23,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 
 
 //readme
@@ -104,12 +100,6 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
     private TextView mRecordTime;
     private TextView mRecordTime1;
     private BroadcastReceiver mReceiver;
-    private static final int VIDEO0 = 0;
-    private static final int VIDEO1 = 1;
-    private static final int VIDEO2 = 2;
-    private static final int VIDEO3 = 3;
-    private static final int VIDEO4 = 4;
-    private static final int VIDEO5 = 5;
     private static final int VIDEO6 = 6;
     private static final int VIDEO7 = 7;
 
@@ -127,7 +117,6 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
             Log.d(TAG, "handleMessage message: " + msg.what);
             switch (msg.what) {
                 case UPDATE_RECORD_TIME: {
-                    //updateRecordingTime((String)msg.obj);
                     mRecordTime.setText((String) msg.obj);
                     break;
                 }
@@ -146,7 +135,6 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
         public void onUpdateTimes(int index, String times) throws RemoteException {
             mHandler.removeMessages(UPDATE_RECORD_TIME);
             Message message = new Message();
-            //Log.d(TAG,"onUpdateTimes index=" + index);
             if (index == cameraid6) {
                 message.what = UPDATE_RECORD_TIME;
             } else if (index == cameraid7) {
@@ -255,13 +243,11 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
         stopService(intent);
     }
 
-    private TvStateReceiver mTvReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate start");
-        //requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
         Constacts.setZhi(Constacts.path, Constacts.zhi);
         Constacts.setZhi(Constacts.path2, Constacts.zhi);
@@ -327,55 +313,9 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
         };
         IntentFilter filter = new IntentFilter("com.android.twovideotest");
         registerReceiver(mReceiver, filter);
-        mTvReceiver = new TvStateReceiver();
-        registerReceiver(mTvReceiver, new IntentFilter(videoStateChange));
         Log.d(TAG, "onCreate finish");
-        //initTask();
     }
 
-    private static final String tvState = "/sys/devices/virtual/switch/tvd_signal/state";
-
-
-    private void initTask() {
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                currentstate = readState();
-            }
-        }, 1000);
-       /*    new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-             int state = readState();
-                if (currentstate != state && state == 1) {
-                    Log.i(TAG, "开启预览");
-                    initVideo6();
-                    initVideo7();
-                } else if (currentstate != state && state == 0) {
-                    stopPreview(cameraid6);
-                    Log.i(TAG, "停止预览");
-                }
-                currentstate = state;
-                Log.i(TAG, "two video  " + (state == 1 ? " on " : " off "));
-            }
-        }, 0, 1000);*/
-    }
-
-    public int readState() {
-        int state = -1;
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(new File(tvState)));
-            String s = reader.readLine();
-            state = Integer.valueOf(s);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return state & 0xff;
-    }
 
     @Override
     public void onClick(View view) {
@@ -418,31 +358,6 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
         }
     }
 
-    int currentstate = -1;
-
-    private class TvStateReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-         /*   String action = intent.getAction();
-            //Log.d(TAG, "action=" + action);
-            if (videoStateChange.equals(action)) {
-                int cameraid = intent.getIntExtra("index", -1);
-                int status = intent.getIntExtra("state", 0);
-                Log.d(TAG, "cameraid=" + cameraid + " status=" + status + " currentstate " + currentstate);
-                if (currentstate == 0 && currentstate != status && status == 1) {
-                    //Log.i(TAG, "重启app");
-                    //RestartAPPTool.restartAPP(MainActivity.this, 0);
-                }
-                if (status == 1) {
-                    if (cameraid == 6) {
-                        initVideo6();
-                    } else if (cameraid == 7) {
-                        initVideo7();
-                    }
-                }
-            }*/
-        }
-    }
 
     @Override
     protected void onDestroy() {
@@ -453,7 +368,6 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
             }
         }
         if (mReceiver != null) unregisterReceiver(mReceiver);
-        if (mTvReceiver != null) unregisterReceiver(mTvReceiver);
         super.onDestroy();
     }
 
