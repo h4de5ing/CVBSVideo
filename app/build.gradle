@@ -11,11 +11,11 @@ android {
         }
     }
     defaultConfig {
-        applicationId "com.example.twovideotest2"
+        applicationId "com.example.twovideotest23"
         minSdkVersion 21
         targetSdkVersion 23
-        versionCode 7
-        versionName "1.5"
+        versionCode 8
+        versionName "1.6"
         signingConfig signingConfigs.release
     }
     buildTypes {

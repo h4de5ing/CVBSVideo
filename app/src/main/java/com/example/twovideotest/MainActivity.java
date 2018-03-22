@@ -198,8 +198,8 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
                 mRecordTime1.setVisibility(View.GONE);
                 mRecordButton1.setImageResource(R.drawable.record_select);
             }
-            unbindVideoService();
-            stopVideoService();
+            //unbindVideoService();
+            //stopVideoService();
         } catch (Exception e) {
             e.printStackTrace();
         }
