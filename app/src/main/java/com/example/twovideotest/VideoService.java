@@ -53,10 +53,7 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
     private int[] mFrameRate;
     private int[] mRecorderBitRate;
     private long[] mRecordingStartTime;
-    private boolean[] mRecorderAudio;
     private SurfaceTexture[] mSurfaceTexture;
-    //private final CameraErrorCallback mErrorCallback = new CameraErrorCallback();
-    //private Receiver mReceiver;
     private Context mContext;
     private RemoteCallbackList<IVideoCallback> mCallbackList = new RemoteCallbackList<IVideoCallback>();
     private int mCameraUVC = -1;
@@ -76,7 +73,6 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
         mOutFormat = new int[MAX_NUM_OF_CAMERAS];
         mFrameRate = new int[MAX_NUM_OF_CAMERAS];
         mRecorderBitRate = new int[MAX_NUM_OF_CAMERAS];
-        mRecorderAudio = new boolean[MAX_NUM_OF_CAMERAS];
         for (int i = 0; i < MAX_NUM_OF_CAMERAS; i++) {
             mCameraDevice[i] = null;
             mSurfaceTexture[i] = null;
@@ -92,12 +88,9 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
                 mVideoHeight[i] = 480;
             }
 
-            //mOutFormat[i] = /*MediaRecorder.OutputFormat.OUTPUT_FORMAT_MPEG2TS*/8;
-            mOutFormat[i] = MediaRecorder.OutputFormat.MPEG_4;//TODO mp4编码
+            mOutFormat[i] = VideoStorage.OUTPUTFORMAT;
             mFrameRate[i] = 30;
             mRecorderBitRate[i] = 6000000;//6M
-            mRecorderAudio[i] = false;
-            //mVideoFilename[i] = new String("/mnt/sdcard/record" + "i" + ".mp4");
         }
     }
 
@@ -105,7 +98,6 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
     public void setNextFileName(int index) {
         if (mMediaRecorder[index] != null) {
             saveVideo(index);
-            //should add a new thread
             DeleteFileThread thread = new DeleteFileThread(index);
             thread.start();
         }
@@ -268,11 +260,6 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
         }
         try {
             mCameraDevice[index] = Camera.open(index);
-            if (index >= 4 && index <= 7) {
-                //mCameraDevice[index].setAnalogInputColor(67, 50, 100); //setting brightness and so on
-                //	int status = Camera.getCVBSInStatus(index);
-                //	Log.d(TAG,"cvbs cameraid=" + index + " status=" + status);
-            }
         } catch (Exception ex) {
             mCameraDevice[index] = null;
             Log.e(TAG, "Camera id=" + index + " does not exist! can not be opened.");
@@ -372,6 +359,7 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
         sendBroadcast(i);
     }
 
+    @SuppressLint("SimpleDateFormat")
     private String createName(int index, long dateTaken) {
         Date date = new Date(dateTaken);
         SimpleDateFormat dateFormat = new SimpleDateFormat("'VID'_yyyyMMdd_HHmmss_" + index);
@@ -414,22 +402,15 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
         Log.d(TAG, "initializeRecorder:" + index);
         if (mCameraDevice[index] == null) return;
         mMediaRecorder[index] = new MediaRecorder(1);
-        //setupMediaRecorderPreviewDisplay();
-        //stopPreview();
         // Unlock the camera object before passing it to media recorder.
         mCameraDevice[index].unlock();
         mMediaRecorder[index].setCamera(mCameraDevice[index]);
-        if (mRecorderAudio[index]) {
-            mMediaRecorder[index].setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
-        }
         mMediaRecorder[index].setVideoSource(MediaRecorder.VideoSource.CAMERA);
-        //mMediaRecorder[index].setAudioSource(MediaRecorder.AudioSource.MIC);
         mMediaRecorder[index].setOutputFormat(mOutFormat[index]);
         mMediaRecorder[index].setVideoFrameRate(mFrameRate[index]);
         Parameters parameters = null;
         try {
             parameters = mCameraDevice[index].getParameters();
-            //parameters.dump();
         } catch (Exception ex) {
             Log.e(TAG, "getParameters:" + ex);
         }
@@ -476,23 +457,14 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
             mMediaRecorder[index].setVideoSize(mVideoWidth[index], mVideoHeight[index]);
         }
         mMediaRecorder[index].setVideoEncodingBitRate(mRecorderBitRate[index]);
-        mMediaRecorder[index].setVideoEncoder(MediaRecorder.VideoEncoder.H264);//TODO MPEG_4_SP H264
-        if (mRecorderAudio[index]) {
-            //mMediaRecorder[index].setAudioSource(MediaRecorder.AudioSource.MIC);
-            //mMediaRecorder[index].setAudioEncodingBitRate(8);
-            //mMediaRecorder[index].setAudioChannels(mProfile[index].audioChannels);
-            //mMediaRecorder[index].setAudioSamplingRate(mProfile[index].audioSampleRate);
-            //mMediaRecorder[index].setAudioEncoder(mProfile[index].audioCodec);
-            //Log.d(TAG, "mProfile.videoFrameWidth, mProfile.videoFrameHeight=" + mProfile[index].videoFrameWidth + "*" + mProfile[index].videoFrameHeight);
-            //mMediaRecorder[index].setVideoSize(mProfile[index].videoFrameWidth, mProfile[index].videoFrameHeight);
-        }
+        mMediaRecorder[index].setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         mVideoFilename[index] = generateVideoFilename(index, mOutFormat[index]);
         Log.d(TAG, "mVideoFilename= " + mVideoFilename[index]);
         mMediaRecorder[index].setOutputFile(mVideoFilename[index]);
         try {
             mMediaRecorder[index].prepare();
         } catch (IOException e) {
-            Log.e(TAG, "prepare failed for " + mVideoFilename.toString(), e);
+            Log.e(TAG, "prepare failed for " + mVideoFilename[index], e);
             releaseMediaRecorder(index);
             throw new RuntimeException(e);
         }
@@ -504,7 +476,7 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
         if (mVideoFilename[index] != null) {
             File f = new File(mVideoFilename[index]);
             if (f.length() == 0 && f.delete()) {
-                Log.v(TAG, "Empty video file deleted: " + mVideoFilename);
+                Log.v(TAG, "Empty video file deleted: " + mVideoFilename[index]);
                 mVideoFilename[index] = null;
             }
         }
@@ -592,7 +564,6 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
         }
         mMediaRecorderRecording[index] = true;
         Log.d(TAG, "mMediaRecorderRecording[ " + index + " ]=" + mMediaRecorderRecording[index]);
-        //mCameraDevice[index].startWaterMark();
         updateRecordingTime(index);
         return OK;
     }
@@ -604,7 +575,6 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
             try {
                 mMediaRecorder[index].setOnErrorListener(null);
                 mMediaRecorder[index].setOnInfoListener(null);
-                //mCameraDevice[index].stopWaterMark();
                 mMediaRecorder[index].stop();
                 Log.d(TAG, "stopVideoRecording: Setting current video filename: " + mVideoFilename[index]);
             } catch (RuntimeException e) {
@@ -617,7 +587,6 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
             if (!fail) {
                 saveVideo(index);
             }
-            // release media recorder
             releaseMediaRecorder(index);
         }
         return OK;
@@ -625,7 +594,6 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
 
     private void onUpdateTimes(int index, String times) {
         int i = mCallbackList.beginBroadcast();
-        //Log.d(TAG,"onUpdateTimes i=" + i);
         while (i > 0) {
             i--;
             try {
@@ -681,23 +649,7 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
         mContext = this;
         setPath();
         initVideoMemembers();
-/*        IntentFilter filter = new IntentFilter("android.hardware.tvd.state.change");
-        mReceiver = new Receiver();
-        registerReceiver(mReceiver, filter);*/
     }
-
- /*   private class Receiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            Log.d(TAG, "action=" + action);
-            if ("android.hardware.tvd.state.change".equals(action)) {
-                int cameraid = intent.getIntExtra("index", -1);
-                int status = intent.getIntExtra("state", 0);
-                Log.d(TAG, "cameraid=" + cameraid + " status=" + status);
-            }
-        }
-    }*/
 
     private void stopPreview() {
         stopPreview(0);
@@ -707,23 +659,7 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
     @Override
     public void onDestroy() {
         super.onDestroy();
-/*        if (mReceiver != null) {
-            unregisterReceiver(mReceiver);
-        }*/
         Log.d(TAG, "videService onDestroy###############");
-    }
-
-    @Override
-    public void onRebind(Intent intent) {
-        super.onRebind(intent);
-        Log.d(TAG, "onRebind");
-    }
-
-    @Override
-    @Deprecated
-    public void onStart(Intent intent, int startId) {
-        super.onStart(intent, startId);
-        Log.d(TAG, "onStart");
     }
 
     @Override

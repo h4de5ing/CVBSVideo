@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.SurfaceTexture;
-import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -85,7 +84,7 @@ import java.io.File;
  *
  *
  * */
-public class MainActivity extends Activity implements MediaRecorder.OnErrorListener, MediaRecorder.OnInfoListener, View.OnClickListener {
+public class MainActivity extends Activity implements View.OnClickListener {
 
     private static final String TAG = "gh0st MainActivity";
     private static final int MAX_NUM_OF_CAMERAS = 2;
@@ -107,7 +106,6 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
     private int cameraid7 = VIDEO7;
 
     private static final boolean mIsSupport2Video = true;
-    private static final String videoStateChange = "android.hardware.tvd.state.change";
     private final Handler mHandler = new MainHandler();
 
     @SuppressLint("HandlerLeak")
@@ -187,6 +185,8 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
     protected void onPause() {
         Log.d(TAG, "onPause ################");
         super.onPause();
+        stopPreview(6);
+        stopPreview(7);
         try {
             if (getRecordingState(cameraid6)) {
                 mService.stopVideoRecording(cameraid6);
@@ -198,8 +198,6 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
                 mRecordTime1.setVisibility(View.GONE);
                 mRecordButton1.setImageResource(R.drawable.record_select);
             }
-            //unbindVideoService();
-            //stopVideoService();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -368,6 +366,7 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
             }
         }
         if (mReceiver != null) unregisterReceiver(mReceiver);
+        unbindVideoService();
         super.onDestroy();
     }
 
@@ -444,12 +443,23 @@ public class MainActivity extends Activity implements MediaRecorder.OnErrorListe
     }
 
     @Override
-    public void onInfo(MediaRecorder arg0, int arg1, int arg2) {
-
-    }
-
-    @Override
-    public void onError(MediaRecorder arg0, int arg1, int arg2) {
-
+    public void onBackPressed() {
+        super.onBackPressed();
+        try {
+            if (getRecordingState(cameraid6)) {
+                mService.stopVideoRecording(cameraid6);
+                mRecordTime.setVisibility(View.GONE);
+                mRecordButton.setImageResource(R.drawable.record_select);
+            }
+            if (getRecordingState(cameraid7)) {
+                mService.stopVideoRecording(cameraid7);
+                mRecordTime1.setVisibility(View.GONE);
+                mRecordButton1.setImageResource(R.drawable.record_select);
+            }
+            //unbindVideoService();
+            //stopVideoService();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
