@@ -1,12 +1,9 @@
 package com.unistrong.dvr;
 
-import android.annotation.SuppressLint;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.Environment;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -20,8 +17,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "gh0st0";
@@ -41,17 +36,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.btn_take_picture).setOnClickListener(this);
         record = (Button) findViewById(R.id.btn_record);
         record.setOnClickListener(this);
-        CountDownTimer cdt = new CountDownTimer(1000, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-
-            }
-
-            @Override
-            public void onFinish() {
-
-            }
-        };
     }
 
     @Override
@@ -152,32 +136,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public static final int MEDIA_TYPE_IMAGE = 1;
-    public static final int MEDIA_TYPE_VIDEO = 2;
-    private String outputMediaFileType;
-
-    private File getOutputMediaFile(int type) {
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "Camera");
-        if (!mediaStorageDir.exists()) {
-            if (!mediaStorageDir.mkdirs()) {
-                Log.d(TAG, "failed to create directory");
-                return null;
-            }
-        }
-        @SuppressLint("SimpleDateFormat") String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File mediaFile;
-        if (type == MEDIA_TYPE_IMAGE) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator + "IMG_" + timeStamp + ".jpg");
-            outputMediaFileType = "image/*";
-        } else if (type == MEDIA_TYPE_VIDEO) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator + "DVR_VID_" + timeStamp + ".mp4");
-            outputMediaFileType = "video/*";
-        } else {
-            outputMediaFileType = "image/*";
-            return mediaFile = new File(mediaStorageDir.getPath() + File.separator + "DVR_" + timeStamp + ".dvr");
-        }
-        return mediaFile;
-    }
 
     /**
      * 拍照
@@ -187,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mCamera.takePicture(null, null, new Camera.PictureCallback() {
                 @Override
                 public void onPictureTaken(byte[] data, Camera camera) {
-                    File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
+                    File pictureFile = FileUtils.getOutputMediaFile(FileUtils.MEDIA_TYPE_IMAGE);
                     try {
                         FileOutputStream fos = new FileOutputStream(pictureFile);
                         fos.write(data);
@@ -264,7 +222,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mMediaRecorder.setVideoSize(720, 576);
             mMediaRecorder.setVideoEncodingBitRate(6000000);//6M
             mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
-            mMediaRecorder.setOutputFile(getOutputMediaFile(MEDIA_TYPE_VIDEO).toString());
+            mMediaRecorder.setOutputFile(FileUtils.getOutputMediaFile(FileUtils.MEDIA_TYPE_VIDEO).toString());
             mMediaRecorder.prepare();
         } catch (IllegalStateException e) {
             Log.d(TAG, "IllegalStateException preparing MediaRecorder: " + e.getMessage());

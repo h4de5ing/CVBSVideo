@@ -27,7 +27,7 @@ public class PermissionActivity extends AppCompatActivity {
         findViewById(R.id.btn_open).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(PermissionActivity.this, MainActivity.class));
+                startActivity(new Intent(PermissionActivity.this, TwoVideoActivity.class));
             }
         });
     }
