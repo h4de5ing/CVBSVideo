@@ -254,7 +254,6 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
     }
 
     public int openCamera(int index) {
-        long start = SystemClock.currentThreadTimeMillis();
         if (mCameraDevice[index] != null) {
             Log.d(TAG, "openCamera222 index=" + index);
             return 0;
@@ -266,12 +265,10 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
             Log.e(TAG, "Camera id=" + index + " does not exist! can not be opened.");
             return -1;
         }
-        System.out.println("gh0sttime openCamera:" + (SystemClock.currentThreadTimeMillis() - start));
         return 0;
     }
 
     public void closeCamera(int index) {
-        long start = SystemClock.currentThreadTimeMillis();
         Log.d(TAG, "closeCamera");
         if (mCameraDevice[index] == null) {
             Log.d(TAG, "already stopped.");
@@ -283,7 +280,6 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
         mPreviewing[index] = false;
         mMediaRecorderRecording[index] = false;
         Log.d(TAG, "closeCamera mMediaRecorderRecording=false");
-        System.out.println("gh0sttime closeCamera:" + (SystemClock.currentThreadTimeMillis() - start));
     }
 
     public int startRender(int index, SurfaceTexture surfaceTexture) {
@@ -307,7 +303,6 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
     }
 
     public synchronized int startPreview(int index, SurfaceTexture surfaceTexture) {
-        long start = SystemClock.currentThreadTimeMillis();
         int state = openCamera(index);
         Log.d(TAG, "startPreview index=" + index + " openCamera:" + state);
         if (state == -1) {
@@ -341,18 +336,15 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
                 }
             }
         }
-        System.out.println("gh0sttime startPreview:" + (SystemClock.currentThreadTimeMillis() - start));
         return OK;
     }
 
     public int stopPreview(int index) {
-        long start = SystemClock.currentThreadTimeMillis();
         if (!mPreviewing[index]) return BAD_VALUE;
         if (mCameraDevice[index] == null)
             return BAD_VALUE;
         mCameraDevice[index].stopPreview();
         mPreviewing[index] = false;
-        System.out.println("gh0sttime stopPreview:" + (SystemClock.currentThreadTimeMillis() - start));
         return OK;
     }
 
@@ -408,8 +400,6 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
     }
 
     private void initializeRecorder(int index) {
-        long start = SystemClock.currentThreadTimeMillis();
-
         Log.d(TAG, "initializeRecorder:" + index);
         if (mCameraDevice[index] == null) return;
         mMediaRecorder[index] = new MediaRecorder(1);
@@ -481,7 +471,6 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
         }
         mMediaRecorder[index].setOnErrorListener(this);
         mMediaRecorder[index].setOnInfoListener(this);
-        System.out.println("gh0sttime initializeRecorder:" + (SystemClock.currentThreadTimeMillis() - start));
     }
 
     private void cleanupEmptyFile(int index) {
@@ -531,7 +520,6 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
     }
 
     public int startVideoRecording(int index, SurfaceTexture surfaceTexture) {
-        long start = SystemClock.currentThreadTimeMillis();
         if (!VideoStorage.storageSpaceIsAvailable(getContentResolver(), mOutFormat[index])) {
             Log.e(TAG, "Not enough storage space!!!");
             Toast.makeText(this, "Not enough storage space!!!", Toast.LENGTH_LONG).show();
@@ -578,12 +566,10 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
         mMediaRecorderRecording[index] = true;
         Log.d(TAG, "mMediaRecorderRecording[ " + index + " ]=" + mMediaRecorderRecording[index]);
         updateRecordingTime(index);
-        System.out.println("gh0sttime startVideoRecording:" + (SystemClock.currentThreadTimeMillis() - start));
         return OK;
     }
 
     public int stopVideoRecording(int index) {
-        long start = SystemClock.currentThreadTimeMillis();
         Log.d(TAG, "stopVideoRecording");
         boolean fail = false;
         if (mMediaRecorderRecording[index]) {
@@ -604,7 +590,6 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
             }
             releaseMediaRecorder(index);
         }
-        System.out.println("gh0sttime stopVideoRecording:" + (SystemClock.currentThreadTimeMillis() - start));
         return OK;
     }
 

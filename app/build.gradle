@@ -11,7 +11,7 @@ android {
         }
     }
     defaultConfig {
-        applicationId "com.example.twovideotest23"
+        applicationId "com.example.twovideotest2"
         minSdkVersion 21
         targetSdkVersion 23
         versionCode 9

@@ -175,9 +175,7 @@ public class VideoStorage {
 
         @Override
         protected void onPostExecute(Uri result) {
-            if (listener != null) {
-                //TODO 快速点击Uri为null
-                Log.i(TAG, "result" + result);
+            if (listener != null && result != null) {
                 listener.onMediaSaved(result);
             }
         }

@@ -185,8 +185,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
     protected void onPause() {
         Log.d(TAG, "onPause ################");
         super.onPause();
-        stopPreview(6);
-        stopPreview(7);
         try {
             if (getRecordingState(cameraid6)) {
                 mService.stopVideoRecording(cameraid6);
