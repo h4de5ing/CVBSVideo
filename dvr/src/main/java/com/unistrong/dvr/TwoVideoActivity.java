@@ -2,6 +2,7 @@ package com.unistrong.dvr;
 
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
+import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
@@ -76,11 +77,14 @@ public class TwoVideoActivity extends AppCompatActivity implements View.OnClickL
                 takePicture7();
                 break;
             case tagRecording6:
+                record6();
                 break;
             case tagRecording7:
+                record7();
                 break;
         }
     }
+
 
     @Override
     protected void onResume() {
@@ -93,6 +97,167 @@ public class TwoVideoActivity extends AppCompatActivity implements View.OnClickL
     protected void onPause() {
         super.onPause();
         stopPreview();
+    }
+
+    private void record6() {
+        if (isRecording6) {
+            tvRecordingTime6.setVisibility(View.GONE);
+            isRecording6 = false;
+            btnRecord6.setText("录像");
+            tvRecordingTime6.stop();
+            stopRecording6();
+        } else {
+            if (startRecording6()) {
+                tvRecordingTime6.setVisibility(View.VISIBLE);
+                tvRecordingTime6.setBase(SystemClock.elapsedRealtime());
+                tvRecordingTime6.start();
+                btnRecord6.setText("停止");
+                isRecording6 = true;
+            } else {
+                tvRecordingTime6.setVisibility(View.GONE);
+                isRecording6 = false;
+                btnRecord6.setText("录像");
+                tvRecordingTime6.stop();
+            }
+        }
+    }
+
+    private void record7() {
+        if (isRecording7) {
+            tvRecordingTime7.setVisibility(View.GONE);
+            isRecording7 = false;
+            btnRecord6.setText("录像");
+            tvRecordingTime7.stop();
+            stopRecording7();
+        } else {
+            if (startRecording7()) {
+                tvRecordingTime7.setVisibility(View.VISIBLE);
+                tvRecordingTime7.setBase(SystemClock.elapsedRealtime());
+                tvRecordingTime7.start();
+                btnRecord7.setText("停止");
+                isRecording7 = true;
+            } else {
+                tvRecordingTime7.setVisibility(View.GONE);
+                isRecording7 = false;
+                btnRecord7.setText("录像");
+                tvRecordingTime7.stop();
+            }
+        }
+    }
+
+    private MediaRecorder mMediaRecorder6;
+    private MediaRecorder mMediaRecorder7;
+
+    public boolean startRecording6() {
+        if (prepareVideoRecorder6()) {
+            mMediaRecorder6.start();
+            return true;
+        } else {
+            releaseMediaRecorder6();
+        }
+        return false;
+    }
+
+
+    public void stopRecording6() {
+        if (mMediaRecorder6 != null) {
+            mMediaRecorder6.stop();
+        }
+        releaseMediaRecorder6();
+    }
+
+    public boolean startRecording7() {
+        if (prepareVideoRecorder7()) {
+            mMediaRecorder7.start();
+            return true;
+        } else {
+            releaseMediaRecorder6();
+        }
+        return false;
+    }
+
+
+    public void stopRecording7() {
+        if (mMediaRecorder7 != null) {
+            mMediaRecorder7.stop();
+        }
+        releaseMediaRecorder6();
+    }
+
+    private boolean prepareVideoRecorder6() {
+        try {
+            mMediaRecorder6 = new MediaRecorder(1);
+            mCamera6.unlock();
+            mMediaRecorder6.setCamera(mCamera6);
+            mMediaRecorder6.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+            mMediaRecorder6.setOutputFormat(8);
+            mMediaRecorder6.setVideoFrameRate(30);
+            mMediaRecorder6.setVideoSize(720, 576);
+            mMediaRecorder6.setVideoEncodingBitRate(6000000);//6M
+            mMediaRecorder6.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+            mMediaRecorder6.setOutputFile(FileUtils.getOutputMediaFile(FileUtils.MEDIA_TYPE_VIDEO).toString());
+            mMediaRecorder6.prepare();
+        } catch (IllegalStateException e) {
+            Log.d(TAG, "IllegalStateException preparing MediaRecorder: " + e.getMessage());
+            releaseMediaRecorder6();
+            return false;
+        } catch (IOException e) {
+            Log.d(TAG, "IOException preparing MediaRecorder: " + e.getMessage());
+            releaseMediaRecorder6();
+            return false;
+        } catch (Exception e) {
+            Log.d(TAG, "Exception preparing MediaRecorder: " + e.getMessage());
+            releaseMediaRecorder6();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean prepareVideoRecorder7() {
+        try {
+            mMediaRecorder7 = new MediaRecorder(1);
+            mCamera7.unlock();
+            mMediaRecorder7.setCamera(mCamera7);
+            mMediaRecorder7.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+            mMediaRecorder7.setOutputFormat(8);
+            mMediaRecorder7.setVideoFrameRate(30);
+            mMediaRecorder7.setVideoSize(720, 576);
+            mMediaRecorder7.setVideoEncodingBitRate(6000000);//6M
+            mMediaRecorder7.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+            mMediaRecorder7.setOutputFile(FileUtils.getOutputMediaFile(FileUtils.MEDIA_TYPE_VIDEO).toString());
+            mMediaRecorder7.prepare();
+        } catch (IllegalStateException e) {
+            Log.d(TAG, "IllegalStateException preparing MediaRecorder: " + e.getMessage());
+            releaseMediaRecorder7();
+            return false;
+        } catch (IOException e) {
+            Log.d(TAG, "IOException preparing MediaRecorder: " + e.getMessage());
+            releaseMediaRecorder7();
+            return false;
+        } catch (Exception e) {
+            Log.d(TAG, "Exception preparing MediaRecorder: " + e.getMessage());
+            releaseMediaRecorder7();
+            return false;
+        }
+        return true;
+    }
+
+    private void releaseMediaRecorder6() {
+        if (mMediaRecorder6 != null) {
+            mMediaRecorder6.reset();
+            mMediaRecorder6.release();
+            mMediaRecorder6 = null;
+            mCamera6.lock();
+        }
+    }
+
+    private void releaseMediaRecorder7() {
+        if (mMediaRecorder7 != null) {
+            mMediaRecorder7.reset();
+            mMediaRecorder7.release();
+            mMediaRecorder7 = null;
+            mCamera7.lock();
+        }
     }
 
     private void initCamera() {
