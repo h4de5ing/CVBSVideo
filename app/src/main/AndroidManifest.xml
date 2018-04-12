@@ -16,7 +16,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ZhiActivity"
+            android:name=".SettingStandardActivity"
             android:icon="@mipmap/ic_launcher_setting"
             android:label="@string/app_name">
             <intent-filter>
@@ -29,25 +29,15 @@
         <service android:name=".VideoService" />
 
         <activity
-            android:name=".PermissionActivity"
-            android:exported="true"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/app_name_setting"
-            android:screenOrientation="landscape">
-<!--            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
-        </activity>
-        <activity
             android:name="com.example.twovideotest.MainActivity"
-            android:label="@string/title_activity_zhi"
             android:exported="true"
+            android:label="@string/title_activity_zhi"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".TestTwoVideoActivity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".OneVideoActivity"
             android:screenOrientation="landscape" />
         <activity
             android:name=".TwoVideoActivity"

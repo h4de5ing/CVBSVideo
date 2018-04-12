@@ -12,7 +12,6 @@ import android.hardware.Camera.Size;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Binder;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -35,7 +34,7 @@ import java.util.List;
 
 public class VideoService extends Service implements MediaRecorder.OnErrorListener, ServiceData, MediaRecorder.OnInfoListener {
 
-    private static final String TAG = "gh0st VideoService";
+    private static final String TAG = "CVBSCamera";
 
     private static final int SAVE_VIDEO = 8;
     private static final int MAX_NUM_OF_CAMERAS = 8;
@@ -216,7 +215,6 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
     }
 
     private void updateRecordingTime(int index) {
-        //Log.d(TAG,"updateRecordingTime mMediaRecorderRecording=" + mMediaRecorderRecording);
         if (!mMediaRecorderRecording[index]) {
             return;
         }
@@ -240,7 +238,7 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
 
     @Override
     public void onError(MediaRecorder mr, int what, int extra) {
-        Log.e(TAG, "MediaRecorder error. what=" + what + ". extra=" + extra);
+        //Log.e(TAG, "MediaRecorder error. what=" + what + ". extra=" + extra);
     }
 
     @Override
@@ -254,11 +252,17 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
     }
 
     public int openCamera(int index) {
+        Log.i(TAG, "openCamera " + (mCameraDevice[index] == null));
         if (mCameraDevice[index] != null) {
             Log.d(TAG, "openCamera222 index=" + index);
             return 0;
         }
         try {
+            if (index == 6) {
+                Constants.setStandard(Constants.path6, Constants.zhi);
+            } else if (index == 7) {
+                Constants.setStandard(Constants.path7, Constants.zhi);
+            }
             mCameraDevice[index] = Camera.open(index);
         } catch (Exception ex) {
             mCameraDevice[index] = null;
@@ -304,32 +308,37 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
 
     public synchronized int startPreview(int index, SurfaceTexture surfaceTexture) {
         int state = openCamera(index);
-        Log.d(TAG, "startPreview index=" + index + " openCamera:" + state);
+        Log.d(TAG, "startPreview index=" + index + " openCamera:" + state + " " + (mCameraDevice[index] == null));
         if (state == -1) {
+            Log.e(TAG, "open failed");
             return FAIL;
         } else {
             if (mPreviewing[index]) {
                 try {
-                    SystemClock.sleep(300);
+                    Log.i(TAG, "mPreviewing 1111111111111111111111111111111111 start");
                     mCameraDevice[index].setPreviewTexture(surfaceTexture);
+                    //SystemClock.sleep(500);
+                    mCameraDevice[index].startPreview();
+                    Log.i(TAG, "mPreviewing 1111111111111111111111111111111111 end");
                 } catch (IOException ex) {
                     mPreviewing[index] = false;
-                    //closeCamera();
-                    Log.e(TAG, "startPreview failed", ex);
+                    //closeCamera(index);
+                    Log.e(TAG, "startPreview failed111", ex);
                     return FAIL;
                 }
             } else {
-                Log.d(TAG, "mCameraDevice not previewing");
                 try {
+                    Log.i(TAG, "not mPreviewing 2222222222222222222222222 start");
                     //mCameraDevice[index].setDisplayOrientation(180);
                     mCameraDevice[index].startPreview();
                     SystemClock.sleep(500);
                     mCameraDevice[index].setPreviewTexture(surfaceTexture);
+                    Log.i(TAG, "not mPreviewing 2222222222222222222222222 end");
                     mPreviewing[index] = true;
                 } catch (IOException ex) {
                     mPreviewing[index] = false;
                     //closeCamera();
-                    Log.e(TAG, "startPreview failed", ex);
+                    Log.e(TAG, "startPreview failed222", ex);
                     return FAIL;
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -386,7 +395,7 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
         // Used when emailing.
         String filename = title + VideoStorage.convertOutputFormatToFileExt(outputFileFormat);
         String mime = VideoStorage.convertOutputFormatToMimeType(outputFileFormat);
-        String path = VideoStorage.DIRECTORY + File.separator + filename;
+        String path = VideoStorage.saveVideoFilePath + File.separator + filename;
 
         mCurrentVideoValues[index] = new ContentValues(9);
         mCurrentVideoValues[index].put(Video.Media.TITLE, title);
@@ -633,28 +642,13 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
         return mBinder;
     }
 
-    void setPath() {
-        //  扩展sd卡目录 /mnt/media_rw/card
-        //VideoStorage.setPath(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + Environment.DIRECTORY_DCIM + File.separator);
-        String path = VideoStorage.TFCardPath + Environment.DIRECTORY_DCIM;
-        if (!new File(path).exists()) {
-            new File(path).mkdir();
-        }
-        VideoStorage.setPath(path);
-    }
 
     @Override
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "onCreate");
         mContext = this;
-        setPath();
         initVideoMemembers();
-    }
-
-    private void stopPreview() {
-        stopPreview(0);
-        stopPreview(1);
     }
 
     @Override

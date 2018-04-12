@@ -11,11 +11,11 @@ android {
         }
     }
     defaultConfig {
-        applicationId "com.example.twovideotest2"
+        applicationId "com.example.twovideotest23"
         minSdkVersion 21
         targetSdkVersion 23
-        versionCode 9
-        versionName "1.7"
+        versionCode 12
+        versionName "1.9"
         signingConfig signingConfigs.release
     }
     buildTypes {
@@ -34,8 +34,7 @@ android {
 
 dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-    implementation 'com.android.support:design:23.4.0'
-    compile 'com.android.support:appcompat-v7:23.0.0'
+    implementation 'com.android.support:appcompat-v7:23.0.0'
 }
 task app(dependsOn: 'assembleDebug') << {
     def today = new Date().format('yyyyMMddHHmmss')

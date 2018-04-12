@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">multivideo</string>
     <string name="app_name_setting">multivideo standard</string>
-    <string name="time">time</string>
     <string name="title_activity_zhi">ZhiActivity</string>
+    <string name="setting_standard">Setting Standard,operation on restart application</string>
+    <string name="dialog_standard">Setting Camera Standard</string>
+    <string name="dialog_tips">next launcher application ,will setting </string>
 </resources>

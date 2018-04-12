@@ -18,26 +18,19 @@ public class VideoStorage {
 
     private static final String TAG = "VideoStorage";
     public static final String VIDEO_BASE_URI = "content://media/external/video/media";
-    public static String DIRECTORY = Environment.DIRECTORY_DCIM + File.separator + "Camera";
     public static final int DELETE_MAX_TIMES = 5;
-    public static final long LOW_STORAGE_THRESHOLD_BYTES = 1024 * 1024 * 1024;//200M;
+    public static final long LOW_STORAGE_THRESHOLD_BYTES = 100 * 1024 * 1024;//200M;
     public static final long VIDEO_FILE_MAX_SIZE = 100 * 1024 * 1024;//10M; //最好小于LOW_STORAGE_THRESHOLD_BYTES的大小
-    public static final String TFCardPath = "/storage/card/";
-    public static final String FilePath = TFCardPath + Environment.DIRECTORY_DCIM;
-    public static final int OUTPUTFORMAT = 8;//MediaRecorder.OutputFormat.OUTPUT_FORMAT_MPEG2TS;
-
-
-    public static void setPath(String path) {
-        DIRECTORY = path;
-        Log.d(TAG, "DIRECTORY=" + DIRECTORY);
-    }
+    public static final String fileRootPath = Environment.getExternalStorageDirectory().getAbsolutePath();//"/storage/card";
+    public static final String saveVideoFilePath = fileRootPath + File.separator + Environment.DIRECTORY_DCIM + File.separator + "Camera";
+    public static final int OUTPUTFORMAT = 8;
 
     public interface OnMediaSavedListener {
         void onMediaSaved(Uri uri);
     }
 
     public static long getStorageSpaceBytes() {
-        File dir = new File(DIRECTORY);
+        File dir = new File(saveVideoFilePath);
         dir.mkdirs();
         if (!dir.isDirectory()) {
             Log.e(TAG, "DIR is not exist ");
@@ -48,9 +41,10 @@ public class VideoStorage {
             return 0;
         }
         try {
-            StatFs stat = new StatFs(TFCardPath);
+            StatFs stat = new StatFs(fileRootPath);
             long size = stat.getAvailableBlocks() * (long) stat.getBlockSize();
-            Log.d(TAG, TFCardPath + ":getAvailableSpace=" + size / 1024 / 1024 + " M");
+            Log.d(TAG, fileRootPath + ":getAvailableSpace=" + size / 1024 / 1024 + " M");
+            //Log.d(TAG, fileRootPath + "getUsableSpace:" + (new File(fileRootPath).getUsableSpace()));
             return size;
         } catch (Exception e) {
             Log.e(TAG, "Fail to access external storage", e);
@@ -64,20 +58,18 @@ public class VideoStorage {
         Uri uri = Uri.parse(VIDEO_BASE_URI);
         String select;
         if (format == OUTPUTFORMAT) {
-            select = Video.Media.DATA + " like '" + DIRECTORY + "%.ts'";
+            select = Video.Media.DATA + " like '" + saveVideoFilePath + "%.ts'";
         } else {
-            select = Video.Media.DATA + " like '" + DIRECTORY + "%.mp4'";
+            select = Video.Media.DATA + " like '" + saveVideoFilePath + "%.mp4'";
         }
 
         Cursor cur = resolver.query(uri, columns, select, null, MediaColumns.DATE_MODIFIED + " ASC");
 
         if ((cur != null) && (cur.moveToFirst())) {
             videoId = cur.getInt(cur.getColumnIndex(Video.Media._ID));
-            //String id = cur.getString(cur.getColumnIndex(MediaStore.Video.Media._ID));
             String path = cur.getString(cur.getColumnIndex(Video.Media.DATA));
-            Log.d(TAG, "find path =" + path + "to delete");
+            Log.d(TAG, "find path =" + path + " to delete");
             deleteVideoFile(path);
-            //Log.d(TAG,"queryRecentVideoFile id=" + videoId);
             cur.close();
         }
         Log.d(TAG, "queryRecentVideoFile2222 id=" + videoId);

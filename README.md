@@ -12,7 +12,12 @@ Camera mCamera7 = Camera.open(7);
 replace android.jar
 Android_sdk\sdk\platforms\android-23\android.jar
 
+## modules:
+app:
 
+rearvideo:
+
+dvr:
 
 目前我们平台支持2路cvbs视频拍照录像
 

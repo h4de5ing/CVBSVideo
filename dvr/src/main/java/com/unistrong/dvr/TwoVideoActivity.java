@@ -13,9 +13,11 @@ import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.Toast;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 
 public class TwoVideoActivity extends AppCompatActivity implements View.OnClickListener {
@@ -38,6 +40,8 @@ public class TwoVideoActivity extends AppCompatActivity implements View.OnClickL
     private final static int tagTackPicture7 = 70;
     private final static int tagRecording6 = 61;
     private final static int tagRecording7 = 71;
+    public static String path6 = "/sys/devices/soc.0/1c33000.tvd2/tvd2_attr/tvd_system";
+    public static String path7 = "/sys/devices/soc.0/1c34000.tvd3/tvd3_attr/tvd_system";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +63,8 @@ public class TwoVideoActivity extends AppCompatActivity implements View.OnClickL
         btnTakePicture7.setTag(tagTackPicture7);
         btnRecord6.setTag(tagRecording6);
         btnRecord7.setTag(tagRecording7);
-
+        //initCamera();
+        //initTextureView();
         btnTakePicture6.setOnClickListener(this);
         btnTakePicture7.setOnClickListener(this);
         btnRecord6.setOnClickListener(this);
@@ -96,6 +101,24 @@ public class TwoVideoActivity extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onPause() {
         super.onPause();
+/*        try {
+            if (isRecording6) {
+                tvRecordingTime6.stop();
+                tvRecordingTime6.setVisibility(View.GONE);
+                isRecording6 = false;
+                btnRecord6.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
+                stopRecording6();
+            }
+            if (isRecording7) {
+                tvRecordingTime7.stop();
+                tvRecordingTime7.setVisibility(View.GONE);
+                isRecording7 = false;
+                btnRecord7.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
+                stopRecording7();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }*/
         stopPreview();
     }
 
@@ -103,7 +126,7 @@ public class TwoVideoActivity extends AppCompatActivity implements View.OnClickL
         if (isRecording6) {
             tvRecordingTime6.setVisibility(View.GONE);
             isRecording6 = false;
-            btnRecord6.setText("录像");
+            btnRecord6.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
             tvRecordingTime6.stop();
             stopRecording6();
         } else {
@@ -111,12 +134,12 @@ public class TwoVideoActivity extends AppCompatActivity implements View.OnClickL
                 tvRecordingTime6.setVisibility(View.VISIBLE);
                 tvRecordingTime6.setBase(SystemClock.elapsedRealtime());
                 tvRecordingTime6.start();
-                btnRecord6.setText("停止");
+                btnRecord6.setBackgroundResource(R.drawable.ic_stop_black_24dp);
                 isRecording6 = true;
             } else {
                 tvRecordingTime6.setVisibility(View.GONE);
                 isRecording6 = false;
-                btnRecord6.setText("录像");
+                btnRecord6.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
                 tvRecordingTime6.stop();
             }
         }
@@ -126,7 +149,7 @@ public class TwoVideoActivity extends AppCompatActivity implements View.OnClickL
         if (isRecording7) {
             tvRecordingTime7.setVisibility(View.GONE);
             isRecording7 = false;
-            btnRecord6.setText("录像");
+            btnRecord7.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
             tvRecordingTime7.stop();
             stopRecording7();
         } else {
@@ -134,12 +157,12 @@ public class TwoVideoActivity extends AppCompatActivity implements View.OnClickL
                 tvRecordingTime7.setVisibility(View.VISIBLE);
                 tvRecordingTime7.setBase(SystemClock.elapsedRealtime());
                 tvRecordingTime7.start();
-                btnRecord7.setText("停止");
+                btnRecord7.setBackgroundResource(R.drawable.ic_stop_black_24dp);
                 isRecording7 = true;
             } else {
                 tvRecordingTime7.setVisibility(View.GONE);
                 isRecording7 = false;
-                btnRecord7.setText("录像");
+                btnRecord7.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
                 tvRecordingTime7.stop();
             }
         }
@@ -263,9 +286,11 @@ public class TwoVideoActivity extends AppCompatActivity implements View.OnClickL
     private void initCamera() {
         try {
             if (mCamera6 == null) {
+                setStandard(path6, 1);//0 NTSC  1 PAL
                 mCamera6 = Camera.open(camera6ID);
             }
             if (mCamera7 == null) {
+                setStandard(path7, 1);//0 NTSC  1 PAL
                 mCamera7 = Camera.open(camera7ID);
             }
         } catch (Exception e) {
@@ -280,10 +305,12 @@ public class TwoVideoActivity extends AppCompatActivity implements View.OnClickL
                 public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
                     if (mCamera6 != null) {
                         try {
+                            Log.i(TAG, "startPreview 6 start");
                             mCamera6.startPreview();
                             SystemClock.sleep(200);
                             mCamera6.setPreviewTexture(surface);
-                        } catch (IOException e) {
+                            Log.i(TAG, "startPreview 6 end");
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
@@ -296,7 +323,6 @@ public class TwoVideoActivity extends AppCompatActivity implements View.OnClickL
 
                 @Override
                 public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-
                     return false;
                 }
 
@@ -312,10 +338,12 @@ public class TwoVideoActivity extends AppCompatActivity implements View.OnClickL
                 public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
                     if (mCamera7 != null) {
                         try {
+                            Log.i(TAG, "startPreview 7 start");
                             mCamera7.startPreview();
                             SystemClock.sleep(200);
                             mCamera7.setPreviewTexture(surface);
-                        } catch (IOException e) {
+                            Log.i(TAG, "startPreview 7 end");
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
@@ -328,7 +356,6 @@ public class TwoVideoActivity extends AppCompatActivity implements View.OnClickL
 
                 @Override
                 public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-
                     return false;
                 }
 
@@ -343,11 +370,11 @@ public class TwoVideoActivity extends AppCompatActivity implements View.OnClickL
     public void stopPreview() {
         if (mCamera6 != null) {
             mCamera6.stopPreview();
-            Log.i(TAG, "stopPreview");
+            Log.i(TAG, "stopPreview 6 ");
         }
         if (mCamera7 != null) {
             mCamera7.stopPreview();
-            Log.i(TAG, "stopPreview");
+            Log.i(TAG, "stopPreview 7 ");
         }
     }
 
@@ -365,7 +392,7 @@ public class TwoVideoActivity extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        stopPreview();
+        //stopPreview();
         closeCamera();
     }
 
@@ -416,6 +443,18 @@ public class TwoVideoActivity extends AppCompatActivity implements View.OnClickL
                     Toast.makeText(TwoVideoActivity.this, "take done 7", Toast.LENGTH_SHORT).show();
                 }
             });
+        }
+    }
+
+    public static void setStandard(String path, int value) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(new File(path)));
+            Log.i("gh0st", "path:" + path + ",write:" + value);
+            writer.write("#" + value);
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

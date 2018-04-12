@@ -1,22 +1,15 @@
 package com.example.twovideotest;
 
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.SurfaceTexture;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
-
-import com.example.twovideotest.R;
-import com.example.twovideotest.VideoService;
 
 /**
  * 只是单纯的预览 没有录制功能
@@ -28,72 +21,37 @@ public class TestTwoVideoActivity extends AppCompatActivity {
     private VideoService mService = null;
     private int cameraid6 = 6;
     private int cameraid7 = 7;
-    private Receiver mReceiver;
-    private Handler mHandler = new Handler();
-    private static final String videoStateChange = "android.hardware.tvd.state.change";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testactivity_two_video);
-        //Constacts.setZhi(Constacts.path, Constacts.zhi);
-        //Constacts.setZhi(Constacts.path2, Constacts.zhi);
         startVideoService();
         View videoView0 = findViewById(R.id.video_0);
         View videoView1 = findViewById(R.id.video_1);
         textureView6 = (TextureView) videoView0.findViewById(R.id.video);
         textureView7 = (TextureView) videoView1.findViewById(R.id.video);
-        //initVideoView();
-        mReceiver = new Receiver();
-        registerReceiver(mReceiver, new IntentFilter(videoStateChange));
     }
 
     @Override
     protected void onResume() {
-        Log.d(TAG, "onResume ################");
         super.onResume();
         bindVideoService();
-        //initVideo6();
-        //initVideo7();
         initVideoView();
     }
 
     @Override
     protected void onPause() {
-        Log.d(TAG, "onPause ################");
         super.onPause();
         unbindVideoService();
     }
 
-    private class Receiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-/*             String action = intent.getAction();
-            //Log.d(TAG, "action=" + action);
-            if (videoStateChange.equals(action)) {
-                int cameraid = intent.getIntExtra("index", -1);
-                int status = intent.getIntExtra("state", 0);
-                //Log.d(TAG, "cameraid=" + cameraid + " status=" + status);
-                if (status == 1) {//上电
-                   if (cameraid == 7) {
-                        initVideo7();
-                    } else if (cameraid == 6) {
-                        initVideo6();
-                    }
-                }
-            }*/
-        }
-    }
-
-
     private void startVideoService() {
-        Log.d(TAG, "#############startVideoService####################");
         Intent intent = new Intent(this, VideoService.class);
         startService(intent);
     }
 
     private void stopVideoService() {
-        Log.d(TAG, "###########stopVideoService##################");
         Intent intent = new Intent(this, VideoService.class);
         stopService(intent);
     }
@@ -111,7 +69,6 @@ public class TestTwoVideoActivity extends AppCompatActivity {
     };
 
     private void bindVideoService() {
-        Log.d(TAG, "bindVideoService###############");
         Intent intent = new Intent(this, VideoService.class);
         bindService(intent, mVideoServiceConn, Context.BIND_AUTO_CREATE);
     }
@@ -125,12 +82,10 @@ public class TestTwoVideoActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG, "##########onDestroy#############");
+        super.onDestroy();
         if (mService != null) {
             stopVideoService();
         }
-        if (mReceiver != null) unregisterReceiver(mReceiver);
-        super.onDestroy();
     }
 
 
@@ -149,16 +104,12 @@ public class TestTwoVideoActivity extends AppCompatActivity {
 
     private void initVideo6() {
         if (mService != null) {
-            //mService.stopPreview(cameraid6);
-            //mService.closeCamera(cameraid6);
             startPreview(cameraid6, textureView6.getSurfaceTexture());
         }
     }
 
     private void initVideo7() {
         if (mService != null) {
-            //mService.stopPreview(cameraid7);
-            //mService.closeCamera(cameraid7);
             startPreview(cameraid7, textureView7.getSurfaceTexture());
         }
     }
@@ -172,7 +123,6 @@ public class TestTwoVideoActivity extends AppCompatActivity {
 
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                Log.d(TAG, "onSurfaceTexture0  Destroyed ");
                 mService.stopPreview(cameraid6);
                 mService.closeCamera(cameraid6);
                 return true;
@@ -194,7 +144,6 @@ public class TestTwoVideoActivity extends AppCompatActivity {
 
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                Log.d(TAG, "onSurfaceTexture1 destroy");
                 mService.stopPreview(cameraid7);
                 mService.closeCamera(cameraid7);
                 return true;

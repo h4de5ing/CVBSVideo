@@ -1,1 +1,1 @@
-include ':app', ':rearvideo', ':dvr'
+include ':app', ':rearvideo', ':dvr', ':backrecord'

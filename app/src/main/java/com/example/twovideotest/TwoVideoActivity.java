@@ -19,18 +19,15 @@ import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class TwoVideoActivity extends AppCompatActivity implements MediaRecorder.OnErrorListener, MediaRecorder.OnInfoListener, View.OnClickListener {
     private static final String TAG = "gh0sttwo";
-    private static final int MAX_NUM_OF_CAMERAS = 2;
     private static final int UPDATE_RECORD_TIME = 1;
     private static final int HIDDEN_CTL_MENU_BAR = 2;
     private static final int UPDATE_RECORD_TIME1 = 3;
     private VideoService mService = null;
-    private LinearLayout mCtrlMenuBar;
     private ImageButton mRecordButton;
     private ImageButton mRecordButton1;
     private ImageButton mBackButton;
@@ -40,12 +37,6 @@ public class TwoVideoActivity extends AppCompatActivity implements MediaRecorder
     private TextView mRecordTime;
     private TextView mRecordTime1;
     private BroadcastReceiver mReceiver;
-    private static final int VIDEO0 = 0;
-    private static final int VIDEO1 = 1;
-    private static final int VIDEO2 = 2;
-    private static final int VIDEO3 = 3;
-    private static final int VIDEO4 = 4;
-    private static final int VIDEO5 = 5;
     private static final int VIDEO6 = 6;
     private static final int VIDEO7 = 7;
 
@@ -59,7 +50,6 @@ public class TwoVideoActivity extends AppCompatActivity implements MediaRecorder
     @Override
     public void onClick(View view) {
         int id = view.getId();
-        Log.d(TAG, "onCtrlMenuBarClick id=" + id);
         switch (id) {
             case R.id.recordbutton:
                 int cameraid = mService.isUVCCameraSonix(cameraid0);
@@ -94,13 +84,6 @@ public class TwoVideoActivity extends AppCompatActivity implements MediaRecorder
 
                 }
                 break;
-            case R.id.settingbutton:
-                finish();
-                break;
-            case R.id.settingbutton2:
-                finish();
-                break;
-
         }
     }
 
@@ -108,10 +91,8 @@ public class TwoVideoActivity extends AppCompatActivity implements MediaRecorder
     private class MainHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
-            //Log.d(TAG, "handleMessage message: " + msg.what);
             switch (msg.what) {
                 case UPDATE_RECORD_TIME: {
-                    //updateRecordingTime((String)msg.obj);
                     mRecordTime.setText((String) msg.obj);
                     break;
                 }
@@ -133,7 +114,6 @@ public class TwoVideoActivity extends AppCompatActivity implements MediaRecorder
         public void onUpdateTimes(int index, String times) throws RemoteException {
             mHandler.removeMessages(UPDATE_RECORD_TIME);
             Message message = new Message();
-            //Log.d(TAG,"onUpdateTimes index=" + index);
             if (index != mService.isUVCCameraSonix(index)) {
                 message.what = UPDATE_RECORD_TIME;
             } else if (index == cameraid0) {
@@ -148,9 +128,7 @@ public class TwoVideoActivity extends AppCompatActivity implements MediaRecorder
 
     private ServiceConnection mVideoServiceConn = new ServiceConnection() {
         public void onServiceConnected(ComponentName classname, IBinder obj) {
-
             mService = ((VideoService.LocalBinder) obj).getService();
-            Log.d(TAG, "mService=" + mService);
             mService.registerCallback(mVideoCallback);
         }
 
@@ -163,7 +141,6 @@ public class TwoVideoActivity extends AppCompatActivity implements MediaRecorder
     };
 
     private void bindVideoService() {
-        Log.d(TAG, "bindVideoService###############");
         Intent intent = new Intent(this, VideoService.class);
         bindService(intent, mVideoServiceConn, Context.BIND_AUTO_CREATE);
     }
@@ -176,7 +153,6 @@ public class TwoVideoActivity extends AppCompatActivity implements MediaRecorder
 
     @Override
     protected void onResume() {
-        Log.d(TAG, "onResume ################");
         super.onResume();
         bindVideoService();
 
@@ -184,7 +160,6 @@ public class TwoVideoActivity extends AppCompatActivity implements MediaRecorder
 
     @Override
     protected void onPause() {
-        Log.d(TAG, "onPause ################");
         super.onPause();
         unbindVideoService();
     }
@@ -196,8 +171,6 @@ public class TwoVideoActivity extends AppCompatActivity implements MediaRecorder
     }
 
     private void startPreview(int cameraId, SurfaceTexture surfaceTexture) {
-
-        Log.d(TAG, "mService=" + mService + " surfaceTexture=" + surfaceTexture);
         if (mService != null && (surfaceTexture != null)) {
             mService.startPreview(cameraId, surfaceTexture);
         }
@@ -210,13 +183,11 @@ public class TwoVideoActivity extends AppCompatActivity implements MediaRecorder
     }
 
     private void startVideoService() {
-        Log.d(TAG, "#############startVideoService####################");
         Intent intent = new Intent(TwoVideoActivity.this, VideoService.class);
         startService(intent);
     }
 
     private void stopVideoService() {
-        Log.d(TAG, "###########stopVideoService##################");
         Intent intent = new Intent(this, VideoService.class);
         stopService(intent);
     }
@@ -224,11 +195,8 @@ public class TwoVideoActivity extends AppCompatActivity implements MediaRecorder
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate start");
-        //requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
         startVideoService();
-        mCtrlMenuBar = (LinearLayout) findViewById(R.id.ctrl_menu_bar);
         mRecordButton = (ImageButton) findViewById(R.id.recordbutton);
         mBackButton = (ImageButton) findViewById(R.id.settingbutton);
         mRecordTime = (TextView) findViewById(R.id.recording_time);
@@ -293,13 +261,10 @@ public class TwoVideoActivity extends AppCompatActivity implements MediaRecorder
         };
         IntentFilter filter = new IntentFilter("com.android.twovideotest");
         registerReceiver(mReceiver, filter);
-        Log.d(TAG, "onCreate finish");
     }
 
     @Override
     protected void onDestroy() {
-        // TODO Auto-generated method stub
-        Log.d(TAG, "##########onDestroy#############");
         int cameraid = mService.isUVCCameraSonix(cameraid0);
         if (cameraid == cameraid0) {
             if (!getRecordingState(cameraid0) && !getRecordingState(cameraid1)) {
@@ -321,8 +286,6 @@ public class TwoVideoActivity extends AppCompatActivity implements MediaRecorder
         textureView0.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
             @Override
             public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-                Log.d(TAG, "mVideo0 Available surface=" + surface);
-
                 mSurfaceTexture0 = surface;
                 int cameraid = mService.isUVCCameraSonix(cameraid0);
                 if (cameraid == cameraid0) {
@@ -360,7 +323,6 @@ public class TwoVideoActivity extends AppCompatActivity implements MediaRecorder
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
                 mSurfaceTexture0 = null;
-                Log.d(TAG, "onSurfaceTexture0  Destroyed ");
                 if (mService.isUVCCameraSonix(cameraid0) == cameraid0) {
                     if (getRecordingState(cameraid0)) {
                         mService.stopRender(cameraid0);
@@ -389,7 +351,6 @@ public class TwoVideoActivity extends AppCompatActivity implements MediaRecorder
             textureView1.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
                 @Override
                 public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-                    Log.d(TAG, "mVideo1 Available surface=" + surface);
                     mSurfaceTexture1 = surface;
 
 
@@ -411,7 +372,6 @@ public class TwoVideoActivity extends AppCompatActivity implements MediaRecorder
 
                 @Override
                 public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                    Log.d(TAG, "onSurfaceTexture1 destroy");
                     mSurfaceTexture1 = null;
 
                     if (getRecordingState(cameraid1)) {

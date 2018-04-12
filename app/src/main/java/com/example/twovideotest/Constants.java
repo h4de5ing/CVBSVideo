@@ -7,17 +7,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-/**
- * Created by John on 2018/3/5.
- */
 
-public class Constacts {
-    public static int zhi = 1;//摄像头制式 0 NTSC  1 PAL
-    public static String path = "/sys/devices/soc.0/1c33000.tvd2/tvd2_attr/tvd_system";
-    public static String path2 = "/sys/devices/soc.0/1c34000.tvd3/tvd3_attr/tvd_system";
+public class Constants {
+    public static int zhi = 1;// 0 NTSC  1 PAL
+    public static String path6 = "/sys/devices/soc.0/1c33000.tvd2/tvd2_attr/tvd_system";
+    public static String path7 = "/sys/devices/soc.0/1c34000.tvd3/tvd3_attr/tvd_system";
+    public static final String STANDARD_KEY = "standard";
 
-    public static void setZhi(String path, int value) {
-        //String path = "/sdcard/txt.txt";
+    public static void setStandard(String path, int value) {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(new File(path)));
             Log.i("gh0st", "path:" + path + ",write:" + value);

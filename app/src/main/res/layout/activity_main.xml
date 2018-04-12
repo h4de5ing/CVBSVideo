@@ -42,7 +42,6 @@
                     android:paddingRight="15dp"
                     android:paddingTop="3dp"
                     android:singleLine="true"
-                    android:text="@string/time"
                     android:textColor="@android:color/white"
                     android:textSize="16sp"
                     android:visibility="gone" />
@@ -90,10 +89,9 @@
                     android:paddingRight="15dp"
                     android:paddingTop="3dp"
                     android:singleLine="true"
-                    android:text="@string/time"
                     android:textColor="@android:color/white"
                     android:textSize="16sp"
-                    android:visibility="gone" />
+                    android:visibility="gone"/>
             </LinearLayout>
 
             <include
