@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">多路视频debug</string>
+    <string name="app_name">多路视频</string>
     <string name="app_name_setting">多路视频 制式</string>
     <string name="setting_standard">设置制式</string>
     <string name="dialog_standard">设置相机制式.重启应用后生效</string>

@@ -32,7 +32,6 @@ public class SettingStandardActivity extends AppCompatActivity {
         } else {
             hasPermission = true;
         }
-        Constants.zhi = (int) SPUtils.getSp(SettingStandardActivity.this, Constants.STANDARD_KEY, 1);
         findViewById(R.id.btn_open_camera).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

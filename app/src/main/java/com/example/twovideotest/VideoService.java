@@ -111,13 +111,13 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
             //stopVideoRecording();
         }
         mVideoFilename[index] = generateVideoFilename(index, mOutFormat[index]);
-
         Log.d(TAG, "setNextFileName video" + index + "=" + mVideoFilename[index]);
         mRecordingStartTime[index] = SystemClock.uptimeMillis();
         try {
             mMediaRecorder[index].setNextSaveFile(mVideoFilename[index]);
         } catch (IOException ex) {
             Log.e(TAG, "setNextSaveFile failed");
+            //android.os.Process.killProcess(android.os.Process.myPid());
         }
         Log.d(TAG, "handleFileDelete video" + index + " end");
     }
@@ -315,11 +315,9 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
         } else {
             if (mPreviewing[index]) {
                 try {
-                    Log.i(TAG, "mPreviewing 1111111111111111111111111111111111 start");
                     mCameraDevice[index].setPreviewTexture(surfaceTexture);
                     //SystemClock.sleep(500);
                     mCameraDevice[index].startPreview();
-                    Log.i(TAG, "mPreviewing 1111111111111111111111111111111111 end");
                 } catch (IOException ex) {
                     mPreviewing[index] = false;
                     //closeCamera(index);
@@ -395,7 +393,7 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
         // Used when emailing.
         String filename = title + VideoStorage.convertOutputFormatToFileExt(outputFileFormat);
         String mime = VideoStorage.convertOutputFormatToMimeType(outputFileFormat);
-        String path = VideoStorage.saveVideoFilePath + File.separator + filename;
+        String path = VideoStorage.getSaveVideoFilePath() + File.separator + filename;
 
         mCurrentVideoValues[index] = new ContentValues(9);
         mCurrentVideoValues[index].put(Video.Media.TITLE, title);

@@ -126,6 +126,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Constants.zhi = (int) SPUtils.getSp(MainActivity.this, Constants.STANDARD_KEY, 1);
         startVideoService();
         mRecordButton = (ImageButton) findViewById(R.id.recordbutton);
         mRecordTime = (TextView) findViewById(R.id.recording_time);
@@ -292,7 +293,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         int id = view.getId();
         switch (id) {
             case R.id.recordbutton:
-                if (new File(VideoStorage.fileRootPath).exists()) {
+                if (new File(VideoStorage.tfPath).exists()) {
                     if (mService != null) {
                         if (getRecordingState(cameraid6)) {
                             mService.stopVideoRecording(cameraid6);
@@ -305,11 +306,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
                         }
                     }
                 } else {
-                    Toast.makeText(MainActivity.this, VideoStorage.fileRootPath + " not exists", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, VideoStorage.tfPath + " not exists", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.recordbutton2:
-                if (new File(VideoStorage.fileRootPath).exists()) {
+                if (new File(VideoStorage.tfPath).exists()) {
                     if (mService != null) {
                         if (getRecordingState(cameraid7)) {
                             mService.stopVideoRecording(cameraid7);
@@ -322,7 +323,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                         }
                     }
                 } else {
-                    Toast.makeText(MainActivity.this, VideoStorage.fileRootPath + " not exists", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, VideoStorage.tfPath + " not exists", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
