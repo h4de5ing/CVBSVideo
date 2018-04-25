@@ -14,7 +14,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
-import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.ImageButton;
@@ -65,7 +64,6 @@ import java.io.File;
  * */
 public class MainActivity extends Activity implements View.OnClickListener {
 
-    private static final String TAG = "CVBSCamera";
     private static final int UPDATE_RECORD_TIME = 1;
     private static final int HIDDEN_CTL_MENU_BAR = 2;
     private static final int UPDATE_RECORD_TIME1 = 3;
@@ -90,7 +88,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private class MainHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
-            Log.d(TAG, "handleMessage message: " + msg.what);
+            L.d( "handleMessage message: " + msg.what);
             switch (msg.what) {
                 case UPDATE_RECORD_TIME: {
                     mRecordTime.setText((String) msg.obj);
@@ -125,6 +123,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        L.init(true,"CVBSCamera");
         setContentView(R.layout.activity_main);
         Constants.zhi = (int) SPUtils.getSp(MainActivity.this, Constants.STANDARD_KEY, 1);
         startVideoService();
@@ -149,10 +148,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
             @Override
             public void onReceive(Context arg0, Intent arg1) {
-                Log.d(TAG, "Intent action=" + arg1.getAction());
+                L.d( "Intent action=" + arg1.getAction());
                 int startRecord = arg1.getIntExtra("start", -1);
                 int stopRecord = arg1.getIntExtra("stop", -1);
-                Log.d(TAG, "startRecord=" + startRecord + " stopRecord=" + stopRecord);
+                L.d( "startRecord=" + startRecord + " stopRecord=" + stopRecord);
                 if (startRecord == 0) {
                     mService.startVideoRecording(cameraid6, mSurfaceTexture0);
                     mRecordTime.setVisibility(View.VISIBLE);
@@ -259,7 +258,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void startPreview(int cameraId, SurfaceTexture surfaceTexture) {
-        //Log.i(TAG, "startPreview " + cameraId + " (mService != null) :" + (mService != null));
+        //L.i( "startPreview " + cameraId + " (mService != null) :" + (mService != null));
         if (mService != null && (surfaceTexture != null)) {
             mService.startPreview(cameraId, surfaceTexture);
         }
@@ -344,14 +343,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
         textureView6.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
             @Override
             public void onSurfaceTextureAvailable(final SurfaceTexture surface, int width, int height) {
-                Log.i(TAG, "video6 1 initTextureView onSurfaceTextureAvailable");
+                L.i( "video6 1 initTextureView onSurfaceTextureAvailable");
                 mSurfaceTexture0 = surface;
                 startPreview(cameraid6, surface);
             }
 
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                Log.d(TAG, "onSurfaceTexture0  Destroyed ");
+                L.d( "onSurfaceTexture0  Destroyed ");
                 stopPreview(cameraid6);
                 closeCamera(cameraid6);
                 return true;
@@ -368,14 +367,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
         textureView7.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
             @Override
             public void onSurfaceTextureAvailable(final SurfaceTexture surface, int width, int height) {
-                Log.i(TAG, "video7 1 initTextureView onSurfaceTextureAvailable");
+                L.i( "video7 1 initTextureView onSurfaceTextureAvailable");
                 mSurfaceTexture1 = surface;
                 startPreview(cameraid7, surface);
             }
 
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                Log.d(TAG, "onSurfaceTexture1 destroy");
+                L.d( "onSurfaceTexture1 destroy");
                 mService.stopPreview(cameraid7);
                 mService.closeCamera(cameraid7);
                 return true;
@@ -392,14 +391,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void initVideo6() {
-        Log.i(TAG, "initVideo6 " + (mService != null));
+        L.i( "initVideo6 " + (mService != null));
         if (mService != null) {
             startPreview(cameraid6, textureView6.getSurfaceTexture());
         }
     }
 
     private void initVideo7() {
-        Log.i(TAG, "initVideo7 " + (mService != null));
+        L.i( "initVideo7 " + (mService != null));
         if (mService != null) {
             startPreview(cameraid7, textureView7.getSurfaceTexture());
         }
