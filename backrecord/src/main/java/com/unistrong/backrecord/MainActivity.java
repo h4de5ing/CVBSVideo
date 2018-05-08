@@ -15,7 +15,9 @@ import java.io.IOException;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "gh0st";
     public static Camera mCamera;
+    public static Camera mCamera7;
     public static final int cameraID = 6;
+    public static final int camera7ID = 6;
     private Button record;
     private boolean isRecording = false;
     private Chronometer tvRecordingTime;

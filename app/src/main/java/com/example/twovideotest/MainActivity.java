@@ -88,7 +88,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private class MainHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
-            L.d( "handleMessage message: " + msg.what);
+            L.d("handleMessage message: " + msg.what);
             switch (msg.what) {
                 case UPDATE_RECORD_TIME: {
                     mRecordTime.setText((String) msg.obj);
@@ -123,7 +123,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        L.init(true,"CVBSCamera");
+        L.init(true, "CVBSCamera");
         setContentView(R.layout.activity_main);
         Constants.zhi = (int) SPUtils.getSp(MainActivity.this, Constants.STANDARD_KEY, 1);
         startVideoService();
@@ -148,10 +148,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
             @Override
             public void onReceive(Context arg0, Intent arg1) {
-                L.d( "Intent action=" + arg1.getAction());
+                L.d("Intent action=" + arg1.getAction());
                 int startRecord = arg1.getIntExtra("start", -1);
                 int stopRecord = arg1.getIntExtra("stop", -1);
-                L.d( "startRecord=" + startRecord + " stopRecord=" + stopRecord);
+                L.d("startRecord=" + startRecord + " stopRecord=" + stopRecord);
                 if (startRecord == 0) {
                     mService.startVideoRecording(cameraid6, mSurfaceTexture0);
                     mRecordTime.setVisibility(View.VISIBLE);
@@ -343,14 +343,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
         textureView6.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
             @Override
             public void onSurfaceTextureAvailable(final SurfaceTexture surface, int width, int height) {
-                L.i( "video6 1 initTextureView onSurfaceTextureAvailable");
+                L.i("video6 1 initTextureView onSurfaceTextureAvailable");
                 mSurfaceTexture0 = surface;
                 startPreview(cameraid6, surface);
             }
 
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                L.d( "onSurfaceTexture0  Destroyed ");
+                L.d("onSurfaceTexture0  Destroyed ");
                 stopPreview(cameraid6);
                 closeCamera(cameraid6);
                 return true;
@@ -367,14 +367,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
         textureView7.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
             @Override
             public void onSurfaceTextureAvailable(final SurfaceTexture surface, int width, int height) {
-                L.i( "video7 1 initTextureView onSurfaceTextureAvailable");
+                L.i("video7 1 initTextureView onSurfaceTextureAvailable");
                 mSurfaceTexture1 = surface;
                 startPreview(cameraid7, surface);
             }
 
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                L.d( "onSurfaceTexture1 destroy");
+                L.d("onSurfaceTexture1 destroy");
                 mService.stopPreview(cameraid7);
                 mService.closeCamera(cameraid7);
                 return true;
@@ -391,14 +391,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void initVideo6() {
-        L.i( "initVideo6 " + (mService != null));
+        L.i("initVideo6 " + (mService != null));
         if (mService != null) {
             startPreview(cameraid6, textureView6.getSurfaceTexture());
         }
     }
 
     private void initVideo7() {
-        L.i( "initVideo7 " + (mService != null));
+        L.i("initVideo7 " + (mService != null));
         if (mService != null) {
             startPreview(cameraid7, textureView7.getSurfaceTexture());
         }

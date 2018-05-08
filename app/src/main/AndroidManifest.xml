@@ -35,7 +35,13 @@
             android:label="@string/app_name_setting"
             android:screenOrientation="landscape" />
         <activity
-            android:name="com.example.twovideotest.MainActivity"
+            android:name=".PermissionActivity2"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name_setting"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".MainActivity"
             android:exported="true"
             android:label="@string/title_activity_zhi"
             android:theme="@style/AppTheme" />
@@ -48,7 +54,7 @@
         <activity
             android:name=".TwoVideoActivity"
             android:screenOrientation="landscape" />
-
+        <activity android:name=".FourVideoActivity" />
     </application>
 
 </manifest>
