@@ -21,8 +21,8 @@ public class VideoStorage {
     public static final int DELETE_MAX_TIMES = 5;
     public static final long LOW_STORAGE_THRESHOLD_BYTES = 100 * 1024 * 1024;//200M;
     public static final long VIDEO_FILE_MAX_SIZE = 100 * 1024 * 1024;//10M; //最好小于LOW_STORAGE_THRESHOLD_BYTES的大小
-    public static final String tfPath = "/storage/card";
     private static final String sdcardPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+    public static final String tfPath = "/storage/card";//sdcardPath;//"/storage/card";
     public static final int OUTPUTFORMAT = 8;
 
     public static String getFileRootPath() {

@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -57,9 +58,13 @@ public class SettingStandardActivity extends AppCompatActivity {
     }
 
     private void startMainActivity() {
-        if (hasPermission)
-            startActivity(new Intent(SettingStandardActivity.this, MainActivity.class));
-        else requestPermission();
+        if (hasPermission) {
+            if ("E9635".equals(Build.MODEL)) {
+                startActivity(new Intent(SettingStandardActivity.this, FourVideoActivity.class));
+            } else {
+                startActivity(new Intent(SettingStandardActivity.this, MainActivity.class));
+            }
+        } else requestPermission();
     }
 
     private void requestPermission() {

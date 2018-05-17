@@ -220,10 +220,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
         stopPreview(cameraid6);
         stopPreview(cameraid7);
         unbindVideoService();
-
-
     }
 
+    @Override
+    protected void onDestroy() {
+        if (!getRecordingState(cameraid6) && !getRecordingState(cameraid7)) stopVideoService();
+        if (mReceiver != null) unregisterReceiver(mReceiver);
+        super.onDestroy();
+    }
     private ServiceConnection mVideoServiceConn = new ServiceConnection() {
         public void onServiceConnected(ComponentName classname, IBinder obj) {
             mService = ((VideoService.LocalBinder) obj).getService();
@@ -328,13 +332,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
     }
 
-
-    @Override
-    protected void onDestroy() {
-        if (!getRecordingState(cameraid6) && !getRecordingState(cameraid7)) stopVideoService();
-        if (mReceiver != null) unregisterReceiver(mReceiver);
-        super.onDestroy();
-    }
 
     private TextureView textureView6;
     private TextureView textureView7;
