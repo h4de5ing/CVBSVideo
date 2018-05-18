@@ -45,15 +45,6 @@
             android:exported="true"
             android:label="@string/title_activity_zhi"
             android:theme="@style/AppTheme" />
-        <activity
-            android:name=".TestTwoVideoActivity"
-            android:screenOrientation="landscape" />
-        <activity
-            android:name=".OneVideoActivity"
-            android:screenOrientation="landscape" />
-        <activity
-            android:name=".TwoVideoActivity"
-            android:screenOrientation="landscape" />
         <activity android:name=".FourVideoActivity" />
     </application>
 

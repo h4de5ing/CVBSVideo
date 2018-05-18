@@ -134,8 +134,8 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
         mRecordButton5.setOnClickListener(this);
         mRecordButton6.setOnClickListener(this);
         mRecordButton7.setOnClickListener(this);
-
         startVideoService();
+        initVideoView();
     }
 
     private void startVideoService() {
@@ -152,14 +152,14 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
     protected void onResume() {
         super.onResume();
         bindVideoService();
-        initVideoView();
+        //initVideoView();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        stopPreview(cameraid6);
-        stopPreview(cameraid7);
+        //stopPreview(cameraid6);
+        //stopPreview(cameraid7);
         unbindVideoService();
     }
 
@@ -170,13 +170,9 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
             initVideo5();
             initVideo6();
             initVideo7();
-            //mService.registerCallback(mVideoCallback);
         }
 
         public void onServiceDisconnected(ComponentName classname) {
-            if (mService != null) {
-                //mService.unregisterCallback(mVideoCallback);
-            }
             mService = null;
         }
     };
@@ -245,13 +241,28 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
             @Override
             public void onSurfaceTextureAvailable(final SurfaceTexture surface, int width, int height) {
                 mSurfaceTexture4 = surface;
-                startPreview(cameraid4, surface);
+                //startPreview(cameraid4, surface);
+                if (getRecordingState(cameraid4)) {
+                    mService.startRender(cameraid4, surface);
+                    mRecordButton4.setImageResource(R.drawable.pause_select);
+                    mRecordTime4.setVisibility(View.VISIBLE);
+                } else {
+                    startPreview(cameraid4, surface);
+                    mRecordButton4.setImageResource(R.drawable.record_select);
+                    mRecordTime4.setVisibility(View.GONE);
+                }
             }
 
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                stopPreview(cameraid4);
-                closeCamera(cameraid4);
+                //stopPreview(cameraid4);
+                //closeCamera(cameraid4);
+                if (getRecordingState(cameraid4)) {
+                    mService.stopRender(cameraid4);
+                } else {
+                    mService.stopPreview(cameraid4);
+                    mService.closeCamera(cameraid4);
+                }
                 return true;
             }
 
@@ -267,13 +278,28 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
             @Override
             public void onSurfaceTextureAvailable(final SurfaceTexture surface, int width, int height) {
                 mSurfaceTexture5 = surface;
-                startPreview(cameraid5, surface);
+                //startPreview(cameraid5, surface);
+                if (getRecordingState(cameraid5)) {
+                    mService.startRender(cameraid5, surface);
+                    mRecordButton5.setImageResource(R.drawable.pause_select);
+                    mRecordTime5.setVisibility(View.VISIBLE);
+                } else {
+                    startPreview(cameraid5, surface);
+                    mRecordButton5.setImageResource(R.drawable.record_select);
+                    mRecordTime5.setVisibility(View.GONE);
+                }
             }
 
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                mService.stopPreview(cameraid5);
-                mService.closeCamera(cameraid5);
+                //mService.stopPreview(cameraid5);
+                //mService.closeCamera(cameraid5);
+                if (getRecordingState(cameraid5)) {
+                    mService.stopRender(cameraid5);
+                } else {
+                    mService.stopPreview(cameraid5);
+                    mService.closeCamera(cameraid5);
+                }
                 return true;
             }
 
@@ -289,13 +315,28 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
             @Override
             public void onSurfaceTextureAvailable(final SurfaceTexture surface, int width, int height) {
                 mSurfaceTexture6 = surface;
-                startPreview(cameraid6, surface);
+                //startPreview(cameraid6, surface);
+                if (getRecordingState(cameraid6)) {
+                    mService.startRender(cameraid6, surface);
+                    mRecordButton6.setImageResource(R.drawable.pause_select);
+                    mRecordTime6.setVisibility(View.VISIBLE);
+                } else {
+                    startPreview(cameraid6, surface);
+                    mRecordButton6.setImageResource(R.drawable.record_select);
+                    mRecordTime6.setVisibility(View.GONE);
+                }
             }
 
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                stopPreview(cameraid6);
-                closeCamera(cameraid6);
+                //stopPreview(cameraid6);
+                //closeCamera(cameraid6);
+                if (getRecordingState(cameraid6)) {
+                    mService.stopRender(cameraid6);
+                } else {
+                    mService.stopPreview(cameraid6);
+                    mService.closeCamera(cameraid6);
+                }
                 return true;
             }
 
@@ -311,13 +352,28 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
             @Override
             public void onSurfaceTextureAvailable(final SurfaceTexture surface, int width, int height) {
                 mSurfaceTexture7 = surface;
-                startPreview(cameraid7, surface);
+                //startPreview(cameraid7, surface);
+                if (getRecordingState(cameraid7)) {
+                    mService.startRender(cameraid7, surface);
+                    mRecordButton7.setImageResource(R.drawable.pause_select);
+                    mRecordTime7.setVisibility(View.VISIBLE);
+                } else {
+                    startPreview(cameraid7, surface);
+                    mRecordButton7.setImageResource(R.drawable.record_select);
+                    mRecordTime7.setVisibility(View.GONE);
+                }
             }
 
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                mService.stopPreview(cameraid7);
-                mService.closeCamera(cameraid7);
+                //mService.stopPreview(cameraid7);
+                //mService.closeCamera(cameraid7);
+                if (getRecordingState(cameraid7)) {
+                    mService.stopRender(cameraid7);
+                } else {
+                    mService.stopPreview(cameraid7);
+                    mService.closeCamera(cameraid7);
+                }
                 return true;
             }
 

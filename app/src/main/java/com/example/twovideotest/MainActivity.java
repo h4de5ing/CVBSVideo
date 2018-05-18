@@ -366,14 +366,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     mService.startRender(cameraid7, surface);
                     mRecordButton1.setImageResource(R.drawable.pause_select);
                     mRecordTime1.setVisibility(View.VISIBLE);
-
-
                 } else {
                     startPreview(cameraid7, surface);
                     mRecordButton1.setImageResource(R.drawable.record_select);
                     mRecordTime1.setVisibility(View.GONE);
                 }
-
             }
 
             @Override
