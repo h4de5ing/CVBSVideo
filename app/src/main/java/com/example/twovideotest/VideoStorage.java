@@ -19,8 +19,7 @@ public class VideoStorage {
     private static final String TAG = "VideoStorage";
     public static final String VIDEO_BASE_URI = "content://media/external/video/media";
     public static final int DELETE_MAX_TIMES = 5;
-    public static final long LOW_STORAGE_THRESHOLD_BYTES = 100 * 1024 * 1024;//200M;
-    public static final long VIDEO_FILE_MAX_SIZE = 100 * 1024 * 1024;//10M; //最好小于LOW_STORAGE_THRESHOLD_BYTES的大小
+    public static final long LOW_STORAGE_THRESHOLD_BYTES = 1024 * 1024 * 1024;// 1G
     private static final String sdcardPath = Environment.getExternalStorageDirectory().getAbsolutePath();
     public static final String tfPath = "/storage/card";//sdcardPath;//"/storage/card";
     public static final int OUTPUTFORMAT = 8;
@@ -158,15 +157,17 @@ public class VideoStorage {
 
         @Override
         protected Uri doInBackground(Void... arg0) {
-            values.put(Video.Media.SIZE, new File(path).length());
-            values.put(Video.Media.DURATION, duration);
             Uri uri = null;
-            try {
-                Uri videoTable = Uri.parse(VIDEO_BASE_URI);
-                Log.d(TAG, "videoTable=" + videoTable);
-                uri = resolver.insert(videoTable, values);
-            } catch (Exception e) {
-                Log.e(TAG, "failed to add video to media storage:" + e);
+            if (new File(path).length() > 0) {
+                values.put(Video.Media.SIZE, new File(path).length());
+                values.put(Video.Media.DURATION, duration);
+                try {
+                    Uri videoTable = Uri.parse(VIDEO_BASE_URI);
+                    Log.d(TAG, "videoTable=" + videoTable);
+                    uri = resolver.insert(videoTable, values);
+                } catch (Exception e) {
+                    Log.e(TAG, "failed to add video to media storage:" + e);
+                }
             }
             return uri;
         }

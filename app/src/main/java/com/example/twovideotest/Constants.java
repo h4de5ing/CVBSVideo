@@ -10,6 +10,8 @@ import java.io.IOException;
 
 public class Constants {
     public static int zhi = 1;// 0 NTSC  1 PAL
+    public static String path4 = "/sys/devices/soc.0/1c31000.tvd0/tvd0_attr/tvd_system";
+    public static String path5 = "/sys/devices/soc.0/1c32000.tvd1/tvd1_attr/tvd_system";
     public static String path6 = "/sys/devices/soc.0/1c33000.tvd2/tvd2_attr/tvd_system";
     public static String path7 = "/sys/devices/soc.0/1c34000.tvd3/tvd3_attr/tvd_system";
     public static final String STANDARD_KEY = "standard";

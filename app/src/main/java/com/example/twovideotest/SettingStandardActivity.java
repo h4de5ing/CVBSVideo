@@ -59,7 +59,7 @@ public class SettingStandardActivity extends AppCompatActivity {
 
     private void startMainActivity() {
         if (hasPermission) {
-            if ("E9635".equals(Build.MODEL)) {
+            if ("E9635".equalsIgnoreCase(Build.DEVICE)) {
                 startActivity(new Intent(SettingStandardActivity.this, FourVideoActivity.class));
             } else {
                 startActivity(new Intent(SettingStandardActivity.this, MainActivity.class));

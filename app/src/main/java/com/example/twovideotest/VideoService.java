@@ -105,10 +105,10 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
 
     synchronized public void handleFileDelete(int index) {
         //空间不够将会删除文件在录制下一个文件
-        L.d("handleFileDelete video" + index + " start");
         if (!VideoStorage.storageSpaceIsAvailable(getContentResolver(), mOutFormat[index])) {
             L.e("Not enough storage space!!!");
             Toast.makeText(mContext, "Not enough storage space!!!", Toast.LENGTH_LONG).show();
+            Log.d("gh0st", "Not enough storage space!!!");
             //stopVideoRecording();
         }
         mVideoFilename[index] = generateVideoFilename(index, mOutFormat[index]);
@@ -117,10 +117,10 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
         try {
             mMediaRecorder[index].setNextSaveFile(mVideoFilename[index]);
         } catch (IOException ex) {
-            L.e("setNextSaveFile failed");
-            //android.os.Process.killProcess(android.os.Process.myPid());
+            ex.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        L.d("handleFileDelete video" + index + " end");
     }
 
     class DeleteFileThread extends Thread {
@@ -253,13 +253,16 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
     }
 
     public int openCamera(int index) {
-        L.i("openCamera " + (mCameraDevice[index] == null));
         if (mCameraDevice[index] != null) {
             L.d("openCamera222 index=" + index);
             return 0;
         }
         try {
-            if (index == 6) {
+            if (index == 4) {
+                Constants.setStandard(Constants.path4, Constants.zhi);
+            } else if (index == 5) {
+                Constants.setStandard(Constants.path5, Constants.zhi);
+            } else if (index == 6) {
                 Constants.setStandard(Constants.path6, Constants.zhi);
             } else if (index == 7) {
                 Constants.setStandard(Constants.path7, Constants.zhi);
@@ -385,7 +388,9 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
     private void saveVideo(int index) {
         long duration = SystemClock.uptimeMillis() - mRecordingStartTime[index];
         Log.i("saveVideo", "saveVideo" + mVideoFilename[index]);
-        VideoStorage.addVideo(mVideoFilename[index], duration, mCurrentVideoValues[index], mMediaSavedListener, getContentResolver());
+        if (new File(mVideoFilename[index]).length() > 0) {
+            VideoStorage.addVideo(mVideoFilename[index], duration, mCurrentVideoValues[index], mMediaSavedListener, getContentResolver());
+        }
     }
 
     private String generateVideoFilename(int index, int outputFileFormat) {

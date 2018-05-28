@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onResume();
         initCamera();
     }
+
     private void initCamera() {
         if (mCamera != null) {
             mCamera.stopPreview();
@@ -50,7 +51,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.e(TAG, "camera is not available check[android.permission.CAMERA]");
             }
         }
+        if (mCamera7 != null) {
+            mCamera7.stopPreview();
+            mCamera7.release();
+            mCamera7 = null;
+        }
+        if (mCamera7 == null) {
+            try {
+                mCamera7 = Camera.open(camera7ID);
+                Log.i(TAG, "open camera");
+            } catch (Exception e) {
+                Log.e(TAG, "camera is not available check[android.permission.CAMERA]");
+            }
+        }
     }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -67,8 +82,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             record.setText("录像");
             tvRecordingTime.stop();
             stopRecording();
+            stopRecording7();
         } else {
-            if (startRecording()) {
+            if (startRecording() && startRecording7()) {
                 tvRecordingTime.setVisibility(View.VISIBLE);
                 tvRecordingTime.setBase(SystemClock.elapsedRealtime());
                 tvRecordingTime.start();
@@ -84,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private MediaRecorder mMediaRecorder;
+    private MediaRecorder mMediaRecorder7;
 
     public boolean startRecording() {
         if (prepareVideoRecorder()) {
@@ -95,12 +112,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return false;
     }
 
+    public boolean startRecording7() {
+        if (prepareVideoRecorder7()) {
+            mMediaRecorder7.start();
+            return true;
+        } else {
+            releaseMediaRecorder7();
+        }
+        return false;
+    }
+
 
     public void stopRecording() {
         if (mMediaRecorder != null) {
             mMediaRecorder.stop();
         }
         releaseMediaRecorder();
+    }
+
+    public void stopRecording7() {
+        if (mMediaRecorder7 != null) {
+            mMediaRecorder7.stop();
+        }
+        releaseMediaRecorder7();
     }
 
     private boolean prepareVideoRecorder() {
@@ -117,15 +151,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mMediaRecorder.setOutputFile(FileUtils.getOutputMediaFile(FileUtils.MEDIA_TYPE_VIDEO).toString());
             mMediaRecorder.prepare();
         } catch (IllegalStateException e) {
-            Log.d(TAG, "IllegalStateException preparing MediaRecorder: " + e.getMessage());
+            Log.d(TAG, "6 IllegalStateException preparing MediaRecorder: " + e.getMessage());
             releaseMediaRecorder();
             return false;
         } catch (IOException e) {
-            Log.d(TAG, "IOException preparing MediaRecorder: " + e.getMessage());
+            Log.d(TAG, "6 IOException preparing MediaRecorder: " + e.getMessage());
             releaseMediaRecorder();
             return false;
         } catch (Exception e) {
-            Log.d(TAG, "Exception preparing MediaRecorder: " + e.getMessage());
+            Log.d(TAG, "6 Exception preparing MediaRecorder: " + e.getMessage());
+            releaseMediaRecorder();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean prepareVideoRecorder7() {
+        try {
+            mMediaRecorder7 = new MediaRecorder(1);
+            mCamera7.unlock();
+            mMediaRecorder7.setCamera(mCamera7);
+            mMediaRecorder7.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+            mMediaRecorder7.setOutputFormat(8);
+            mMediaRecorder7.setVideoFrameRate(30);
+            mMediaRecorder7.setVideoSize(720, 576);
+            mMediaRecorder7.setVideoEncodingBitRate(6000000);//6M
+            mMediaRecorder7.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+            mMediaRecorder7.setOutputFile(FileUtils.getOutputMediaFile(FileUtils.MEDIA_TYPE_VIDEO).toString());
+            mMediaRecorder7.prepare();
+        } catch (IllegalStateException e) {
+            Log.d(TAG, "7 IllegalStateException preparing MediaRecorder: " + e.getMessage());
+            releaseMediaRecorder();
+            return false;
+        } catch (IOException e) {
+            Log.d(TAG, "7 IOException preparing MediaRecorder: " + e.getMessage());
+            releaseMediaRecorder();
+            return false;
+        } catch (Exception e) {
+            Log.d(TAG, "7 Exception preparing MediaRecorder: " + e.getMessage());
             releaseMediaRecorder();
             return false;
         }
@@ -141,11 +204,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private void releaseMediaRecorder7() {
+        if (mMediaRecorder7 != null) {
+            mMediaRecorder7.reset();
+            mMediaRecorder7.release();
+            mMediaRecorder7 = null;
+            mCamera7.lock();
+        }
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if (isRecording) {
             stopRecording();
+            stopRecording7();
         }
     }
 }

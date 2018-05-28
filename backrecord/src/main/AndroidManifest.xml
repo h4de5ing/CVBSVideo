@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.RECORD_VIDEO" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
@@ -26,6 +26,11 @@
         <activity
             android:name=".MainActivity"
             android:screenOrientation="landscape" />
+
+        <service
+            android:name=".BackgroundVideoRecorderService"
+            android:enabled="true"
+            android:exported="true"/>
     </application>
 
 </manifest>

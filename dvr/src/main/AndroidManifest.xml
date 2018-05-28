@@ -29,6 +29,10 @@
             android:name=".MainActivity"
             android:screenOrientation="landscape" />
         <activity android:name=".TwoVideoActivity" />
+        <activity
+            android:name=".camera2.TestCameraActivity"
+            android:screenOrientation="landscape" />
+        <activity android:name=".camera2.GoogleSamplesCamera2Activity"></activity>
     </application>
 
 </manifest>

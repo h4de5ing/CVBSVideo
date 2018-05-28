@@ -101,7 +101,7 @@ public class TwoVideoActivity extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onPause() {
         super.onPause();
-/*        try {
+        try {
             if (isRecording6) {
                 tvRecordingTime6.stop();
                 tvRecordingTime6.setVisibility(View.GONE);
@@ -118,7 +118,7 @@ public class TwoVideoActivity extends AppCompatActivity implements View.OnClickL
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }*/
+        }
         stopPreview();
     }
 

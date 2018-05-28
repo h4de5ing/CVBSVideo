@@ -21,6 +21,7 @@ public class PermissionActivity extends AppCompatActivity {
                     Manifest.permission.CAMERA,
                     Manifest.permission.RECORD_AUDIO}, 0);
         }
+        //startService(new Intent(PermissionActivity.this, BackgroundVideoRecorderService.class));
         startActivity(new Intent(PermissionActivity.this, MainActivity.class));
     }
 }
