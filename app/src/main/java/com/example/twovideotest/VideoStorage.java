@@ -12,6 +12,8 @@ import android.provider.MediaStore.MediaColumns;
 import android.provider.MediaStore.Video;
 import android.util.Log;
 
+import com.example.twovideotest.utils.DeleteUtils;
+
 import java.io.File;
 
 public class VideoStorage {
@@ -105,10 +107,11 @@ public class VideoStorage {
         if (getStorageSpaceBytes() > LOW_STORAGE_THRESHOLD_BYTES) {
             return true;
         }
-        while (deleteTimes < DELETE_MAX_TIMES) {
-            deleteVideoFile(resolver, format);
-            deleteTimes++;
-        }
+        DeleteUtils.deleteAHalfFile(getSaveVideoFilePath());
+        //while (deleteTimes < DELETE_MAX_TIMES) {
+        //    deleteVideoFile(resolver, format);
+        //    deleteTimes++;
+        //}
         return true;
     }
 
