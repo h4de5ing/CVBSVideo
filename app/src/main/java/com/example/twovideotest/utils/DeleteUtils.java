@@ -1,35 +1,35 @@
 package com.example.twovideotest.utils;
 
+import android.content.ComponentName;
+
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.Iterator;
+import java.util.TreeMap;
 
 /**
  * 每次删除一半的文件
  */
 public class DeleteUtils {
-    public static void deleteAHalfFile(String path) {
-        List<FileBean> fileList = new ArrayList<FileBean>();
+    public static void deleteFile(String path) {
+        TreeMap fileList = new TreeMap<Long, String>();
         File[] files = new File(path).listFiles();
-        for (File file : files) {
-            fileList.add(new FileBean(file.getAbsolutePath(), file.lastModified()));
+        if (files != null) {
+            for (File file : files) {
+                fileList.put(file.lastModified(), file.getAbsolutePath());
+            }
+            Iterator<Long> iterator = fileList.keySet().iterator();
+            int i = 0;
+            while (iterator.hasNext()) {
+                i++;
+                if (i <= (fileList.size() / 2)) {
+                    Long key = iterator.next();
+                    String name = fileList.get(key).toString();
+                    boolean delete = new File(name).delete();
+                    System.out.println("deleteFile:" + name + " ,success: " + (delete));
+                }
+            }
         }
-        Collections.sort(fileList, new StepComparator());
-        for (int i = 0; i < fileList.size() / 2; i++) {
-            String name = fileList.get(i).getName();
-            boolean delete = new File(name).delete();
-            System.out.println("delete:" + name + " ,success: " + (delete));
-        }
-    }
-
-    public static class StepComparator implements Comparator<FileBean> {
-
-        @Override
-        public int compare(FileBean o1, FileBean o2) {
-            if (o1.getDate() > o2.getDate()) return 1;
-            return -1;
-        }
+       //ComponentName ss;
+       //ss.getPackageName().contains()
     }
 }

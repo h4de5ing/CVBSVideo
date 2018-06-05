@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.SurfaceTexture;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
@@ -41,6 +42,7 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
     private Chronometer mRecordTime5;
     private Chronometer mRecordTime6;
     private Chronometer mRecordTime7;
+    private Handler mHandler = new Handler();
 
     @Override
     public void onClick(View view) {
@@ -48,6 +50,7 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
         Log.i("gh0st", "onClick:" + tag);
         switch (tag) {
             case VIDEO4:
+                mRecordButton4.setEnabled(false);
                 if (getRecordingState(cameraid4)) {
                     mService.stopVideoRecording(cameraid4);
                     mRecordTime4.setVisibility(View.GONE);
@@ -60,8 +63,15 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
                     mRecordTime4.start();
                     mRecordButton4.setImageResource(R.drawable.pause_select);
                 }
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mRecordButton4.setEnabled(true);
+                    }
+                }, 1000);
                 break;
             case VIDEO5:
+                mRecordButton5.setEnabled(false);
                 if (getRecordingState(cameraid5)) {
                     mService.stopVideoRecording(cameraid5);
                     mRecordTime5.setVisibility(View.GONE);
@@ -74,8 +84,15 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
                     mRecordTime5.start();
                     mRecordButton5.setImageResource(R.drawable.pause_select);
                 }
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mRecordButton5.setEnabled(true);
+                    }
+                }, 1000);
                 break;
             case VIDEO6:
+                mRecordButton6.setEnabled(false);
                 if (getRecordingState(cameraid6)) {
                     mService.stopVideoRecording(cameraid6);
                     mRecordTime6.setVisibility(View.GONE);
@@ -88,8 +105,15 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
                     mRecordTime6.start();
                     mRecordButton6.setImageResource(R.drawable.pause_select);
                 }
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mRecordButton6.setEnabled(true);
+                    }
+                }, 1000);
                 break;
             case VIDEO7:
+                mRecordButton7.setEnabled(false);
                 if (getRecordingState(cameraid7)) {
                     mService.stopVideoRecording(cameraid7);
                     mRecordTime7.setVisibility(View.GONE);
@@ -102,6 +126,12 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
                     mRecordTime7.start();
                     mRecordButton7.setImageResource(R.drawable.pause_select);
                 }
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mRecordButton7.setEnabled(true);
+                    }
+                }, 1000);
                 break;
         }
     }

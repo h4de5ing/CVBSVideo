@@ -107,7 +107,12 @@ public class VideoStorage {
         if (getStorageSpaceBytes() > LOW_STORAGE_THRESHOLD_BYTES) {
             return true;
         }
-        DeleteUtils.deleteAHalfFile(getSaveVideoFilePath());
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DeleteUtils.deleteFile(getSaveVideoFilePath());
+            }
+        }).start();
         //while (deleteTimes < DELETE_MAX_TIMES) {
         //    deleteVideoFile(resolver, format);
         //    deleteTimes++;

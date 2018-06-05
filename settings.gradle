@@ -1,1 +1,1 @@
-include ':app', ':rearvideo', ':dvr', ':backrecord'
+include ':app' /*,':rearvideo', ':dvr', ':backrecord'*/
