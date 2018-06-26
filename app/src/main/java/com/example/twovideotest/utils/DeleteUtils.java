@@ -1,7 +1,5 @@
 package com.example.twovideotest.utils;
 
-import android.content.ComponentName;
-
 import java.io.File;
 import java.util.Iterator;
 import java.util.TreeMap;
@@ -29,7 +27,5 @@ public class DeleteUtils {
                 }
             }
         }
-       //ComponentName ss;
-       //ss.getPackageName().contains()
     }
 }

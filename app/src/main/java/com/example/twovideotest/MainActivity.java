@@ -65,8 +65,7 @@ import java.io.File;
 public class MainActivity extends Activity implements View.OnClickListener {
 
     private static final int UPDATE_RECORD_TIME = 1;
-    private static final int HIDDEN_CTL_MENU_BAR = 2;
-    private static final int UPDATE_RECORD_TIME1 = 3;
+    private static final int UPDATE_RECORD_TIME1 = 2;
     private VideoService mService = null;
     private ImageButton mRecordButton;
     private ImageButton mRecordButton1;
@@ -88,18 +87,18 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private class MainHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
-            L.d("handleMessage message: " + msg.what);
             switch (msg.what) {
                 case UPDATE_RECORD_TIME: {
-                    mRecordTime.setText((String) msg.obj);
+                    if (mRecordTime != null) {
+                        mRecordTime.setText((String) msg.obj);
+                    }
                     break;
                 }
                 case UPDATE_RECORD_TIME1:
-                    mRecordTime1.setText((String) msg.obj);
+                    if (mRecordTime1 != null) {
+                        mRecordTime1.setText((String) msg.obj);
+                    }
                     break;
-                case HIDDEN_CTL_MENU_BAR: {
-                }
-                break;
             }
         }
     }
@@ -108,6 +107,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         @Override
         public void onUpdateTimes(int index, String times) throws RemoteException {
             mHandler.removeMessages(UPDATE_RECORD_TIME);
+            mHandler.removeMessages(UPDATE_RECORD_TIME1);
             Message message = new Message();
             if (index == cameraid6) {
                 message.what = UPDATE_RECORD_TIME;
@@ -170,7 +170,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     mRecordTime1.setVisibility(View.VISIBLE);
                     mRecordButton1.setImageResource(R.drawable.pause_select);
                 }
-
                 if (stopRecord == 0) {
                     mService.stopVideoRecording(cameraid6);
                     mRecordTime.setVisibility(View.GONE);

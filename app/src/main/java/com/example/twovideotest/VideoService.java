@@ -34,6 +34,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.example.twovideotest.VideoStorage.getSaveVideoFilePath;
+
 public class VideoService extends Service implements MediaRecorder.OnErrorListener, ServiceData, MediaRecorder.OnInfoListener {
 
 
@@ -58,7 +60,7 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
     private RemoteCallbackList<IVideoCallback> mCallbackList = new RemoteCallbackList<IVideoCallback>();
     private int mCameraUVC = -1;
 
-    private void initVideoMemembers() {
+    private void initVideoMembers() {
         mCameraUVC = -1;
         mCameraDevice = new Camera[MAX_NUM_OF_CAMERAS];
         mSurfaceTexture = new SurfaceTexture[MAX_NUM_OF_CAMERAS];
@@ -399,7 +401,7 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
         // Used when emailing.
         String filename = title + VideoStorage.convertOutputFormatToFileExt(outputFileFormat);
         String mime = VideoStorage.convertOutputFormatToMimeType(outputFileFormat);
-        String path = VideoStorage.getSaveVideoFilePath() + File.separator + filename;
+        String path = getSaveVideoFilePath() + File.separator + filename;
 
         mCurrentVideoValues[index] = new ContentValues(9);
         mCurrentVideoValues[index].put(Video.Media.TITLE, title);
@@ -653,7 +655,19 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
         L.init(true, "CVBSCamera");
         L.d("onCreate");
         mContext = this;
-        initVideoMemembers();
+        //initTimer();
+        initVideoMembers();
+    }
+
+    private void initTimer() {
+       /* new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (VideoStorage.getStorageSpaceBytes() < VideoStorage.LOW_STORAGE_THRESHOLD_BYTES) {
+                    DeleteUtils.deleteFile(getSaveVideoFilePath());
+                }
+            }
+        }, 1000, 60 * 1000);*/
     }
 
     @Override

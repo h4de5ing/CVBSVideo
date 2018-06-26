@@ -9,16 +9,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <Chronometer
-        android:id="@+id/tv_recording_time"
+    <TextView
+        android:id="@+id/recording_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="20dp"
+        android:background="@drawable/bg_text_on_preview"
         android:drawableLeft="@drawable/ic_recording_indicator"
+        android:drawablePadding="5dp"
         android:gravity="center"
-        android:visibility="gone"
-        tools:visibility="visible" />
+        android:singleLine="true"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:visibility="gone" />
 
     <ImageButton
         android:id="@+id/recordbutton"
