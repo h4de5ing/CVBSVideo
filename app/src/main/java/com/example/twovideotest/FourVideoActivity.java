@@ -1,5 +1,6 @@
 package com.example.twovideotest;
 
+import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -8,13 +9,14 @@ import android.graphics.SurfaceTexture;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.SystemClock;
+import android.os.Message;
+import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
-import android.widget.Chronometer;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 public class FourVideoActivity extends AppCompatActivity implements View.OnClickListener {
     private static final int VIDEO4 = 4;
@@ -38,11 +40,30 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
     private ImageButton mRecordButton5;
     private ImageButton mRecordButton6;
     private ImageButton mRecordButton7;
-    private Chronometer mRecordTime4;
-    private Chronometer mRecordTime5;
-    private Chronometer mRecordTime6;
-    private Chronometer mRecordTime7;
-    private Handler mHandler = new Handler();
+    private TextView mTvRecordTime4;
+    private TextView mTvRecordTime5;
+    private TextView mTvRecordTime6;
+    private TextView mTvRecordTime7;
+    @SuppressLint("HandlerLeak")
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case UPDATE_RECORD_TIME4:
+                    mTvRecordTime4.setText((String) msg.obj);
+                    break;
+                case UPDATE_RECORD_TIME5:
+                    mTvRecordTime5.setText((String) msg.obj);
+                    break;
+                case UPDATE_RECORD_TIME6:
+                    mTvRecordTime6.setText((String) msg.obj);
+                    break;
+                case UPDATE_RECORD_TIME7:
+                    mTvRecordTime7.setText((String) msg.obj);
+                    break;
+            }
+        }
+    };
 
     @Override
     public void onClick(View view) {
@@ -53,14 +74,11 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
                 mRecordButton4.setEnabled(false);
                 if (getRecordingState(cameraid4)) {
                     mService.stopVideoRecording(cameraid4);
-                    mRecordTime4.setVisibility(View.GONE);
-                    mRecordTime4.stop();
+                    mTvRecordTime4.setVisibility(View.GONE);
                     mRecordButton4.setImageResource(R.drawable.record_select);
                 } else {
                     mService.startVideoRecording(cameraid4, mSurfaceTexture4);
-                    mRecordTime4.setVisibility(View.VISIBLE);
-                    mRecordTime4.setBase(SystemClock.elapsedRealtime());
-                    mRecordTime4.start();
+                    mTvRecordTime4.setVisibility(View.VISIBLE);
                     mRecordButton4.setImageResource(R.drawable.pause_select);
                 }
                 mHandler.postDelayed(new Runnable() {
@@ -74,14 +92,11 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
                 mRecordButton5.setEnabled(false);
                 if (getRecordingState(cameraid5)) {
                     mService.stopVideoRecording(cameraid5);
-                    mRecordTime5.setVisibility(View.GONE);
-                    mRecordTime5.stop();
+                    mTvRecordTime5.setVisibility(View.GONE);
                     mRecordButton5.setImageResource(R.drawable.record_select);
                 } else {
                     mService.startVideoRecording(cameraid5, mSurfaceTexture5);
-                    mRecordTime5.setVisibility(View.VISIBLE);
-                    mRecordTime5.setBase(SystemClock.elapsedRealtime());
-                    mRecordTime5.start();
+                    mTvRecordTime5.setVisibility(View.VISIBLE);
                     mRecordButton5.setImageResource(R.drawable.pause_select);
                 }
                 mHandler.postDelayed(new Runnable() {
@@ -95,14 +110,11 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
                 mRecordButton6.setEnabled(false);
                 if (getRecordingState(cameraid6)) {
                     mService.stopVideoRecording(cameraid6);
-                    mRecordTime6.setVisibility(View.GONE);
-                    mRecordTime6.stop();
+                    mTvRecordTime6.setVisibility(View.GONE);
                     mRecordButton6.setImageResource(R.drawable.record_select);
                 } else {
                     mService.startVideoRecording(cameraid6, mSurfaceTexture6);
-                    mRecordTime6.setVisibility(View.VISIBLE);
-                    mRecordTime6.setBase(SystemClock.elapsedRealtime());
-                    mRecordTime6.start();
+                    mTvRecordTime6.setVisibility(View.VISIBLE);
                     mRecordButton6.setImageResource(R.drawable.pause_select);
                 }
                 mHandler.postDelayed(new Runnable() {
@@ -116,14 +128,11 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
                 mRecordButton7.setEnabled(false);
                 if (getRecordingState(cameraid7)) {
                     mService.stopVideoRecording(cameraid7);
-                    mRecordTime7.setVisibility(View.GONE);
-                    mRecordTime7.stop();
+                    mTvRecordTime7.setVisibility(View.GONE);
                     mRecordButton7.setImageResource(R.drawable.record_select);
                 } else {
                     mService.startVideoRecording(cameraid7, mSurfaceTexture7);
-                    mRecordTime7.setVisibility(View.VISIBLE);
-                    mRecordTime7.setBase(SystemClock.elapsedRealtime());
-                    mRecordTime7.start();
+                    mTvRecordTime7.setVisibility(View.VISIBLE);
                     mRecordButton7.setImageResource(R.drawable.pause_select);
                 }
                 mHandler.postDelayed(new Runnable() {
@@ -153,10 +162,10 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
         mRecordButton5 = (ImageButton) video5.findViewById(R.id.recordbutton);
         mRecordButton6 = (ImageButton) video6.findViewById(R.id.recordbutton);
         mRecordButton7 = (ImageButton) video7.findViewById(R.id.recordbutton);
-        mRecordTime4 = (Chronometer) video4.findViewById(R.id.tv_recording_time);
-        mRecordTime5 = (Chronometer) video5.findViewById(R.id.tv_recording_time);
-        mRecordTime6 = (Chronometer) video6.findViewById(R.id.tv_recording_time);
-        mRecordTime7 = (Chronometer) video7.findViewById(R.id.tv_recording_time);
+        mTvRecordTime4 = (TextView) video4.findViewById(R.id.recording_time);
+        mTvRecordTime5 = (TextView) video5.findViewById(R.id.recording_time);
+        mTvRecordTime6 = (TextView) video6.findViewById(R.id.recording_time);
+        mTvRecordTime7 = (TextView) video7.findViewById(R.id.recording_time);
         mRecordButton4.setTag(VIDEO4);
         mRecordButton5.setTag(VIDEO5);
         mRecordButton6.setTag(VIDEO6);
@@ -168,6 +177,33 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
         startVideoService();
         initVideoView();
     }
+
+
+    private static final int UPDATE_RECORD_TIME4 = 4;
+    private static final int UPDATE_RECORD_TIME5 = 5;
+    private static final int UPDATE_RECORD_TIME6 = 6;
+    private static final int UPDATE_RECORD_TIME7 = 7;
+    private IVideoCallback.Stub mVideoCallback = new IVideoCallback.Stub() {
+        @Override
+        public void onUpdateTimes(int index, String times) throws RemoteException {
+            mHandler.removeMessages(UPDATE_RECORD_TIME4);
+            mHandler.removeMessages(UPDATE_RECORD_TIME5);
+            mHandler.removeMessages(UPDATE_RECORD_TIME6);
+            mHandler.removeMessages(UPDATE_RECORD_TIME7);
+            Message message = new Message();
+            if (index == cameraid4) {
+                message.what = UPDATE_RECORD_TIME4;
+            } else if (index == cameraid5) {
+                message.what = UPDATE_RECORD_TIME5;
+            } else if (index == cameraid6) {
+                message.what = UPDATE_RECORD_TIME6;
+            } else if (index == cameraid7) {
+                message.what = UPDATE_RECORD_TIME7;
+            }
+            message.obj = times;
+            mHandler.sendMessage(message);
+        }
+    };
 
     private void startVideoService() {
         Intent intent = new Intent(FourVideoActivity.this, VideoService.class);
@@ -201,9 +237,13 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
             initVideo5();
             initVideo6();
             initVideo7();
+            mService.registerCallback(mVideoCallback);
         }
 
         public void onServiceDisconnected(ComponentName classname) {
+            if (mService != null) {
+                mService.unregisterCallback(mVideoCallback);
+            }
             mService = null;
         }
     };
@@ -272,24 +312,21 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
             @Override
             public void onSurfaceTextureAvailable(final SurfaceTexture surface, int width, int height) {
                 mSurfaceTexture4 = surface;
-                //startPreview(cameraid4, surface);
                 if (mService != null) {
                     if (getRecordingState(cameraid4)) {
                         mService.startRender(cameraid4, surface);
                         mRecordButton4.setImageResource(R.drawable.pause_select);
-                        mRecordTime4.setVisibility(View.VISIBLE);
+                        mTvRecordTime4.setVisibility(View.VISIBLE);
                     } else {
                         startPreview(cameraid4, surface);
                         mRecordButton4.setImageResource(R.drawable.record_select);
-                        mRecordTime4.setVisibility(View.GONE);
+                        mTvRecordTime4.setVisibility(View.GONE);
                     }
                 }
             }
 
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                //stopPreview(cameraid4);
-                //closeCamera(cameraid4);
                 if (mService != null) {
                     if (getRecordingState(cameraid4)) {
                         mService.stopRender(cameraid4);
@@ -313,24 +350,21 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
             @Override
             public void onSurfaceTextureAvailable(final SurfaceTexture surface, int width, int height) {
                 mSurfaceTexture5 = surface;
-                //startPreview(cameraid5, surface);
                 if (mService != null) {
                     if (getRecordingState(cameraid5)) {
                         mService.startRender(cameraid5, surface);
                         mRecordButton5.setImageResource(R.drawable.pause_select);
-                        mRecordTime5.setVisibility(View.VISIBLE);
+                        mTvRecordTime5.setVisibility(View.VISIBLE);
                     } else {
                         startPreview(cameraid5, surface);
                         mRecordButton5.setImageResource(R.drawable.record_select);
-                        mRecordTime5.setVisibility(View.GONE);
+                        mTvRecordTime5.setVisibility(View.GONE);
                     }
                 }
             }
 
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                //mService.stopPreview(cameraid5);
-                //mService.closeCamera(cameraid5);
                 if (mService != null) {
                     if (getRecordingState(cameraid5)) {
                         mService.stopRender(cameraid5);
@@ -354,24 +388,21 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
             @Override
             public void onSurfaceTextureAvailable(final SurfaceTexture surface, int width, int height) {
                 mSurfaceTexture6 = surface;
-                //startPreview(cameraid6, surface);
                 if (mService != null) {
                     if (getRecordingState(cameraid6)) {
                         mService.startRender(cameraid6, surface);
                         mRecordButton6.setImageResource(R.drawable.pause_select);
-                        mRecordTime6.setVisibility(View.VISIBLE);
+                        mTvRecordTime6.setVisibility(View.VISIBLE);
                     } else {
                         startPreview(cameraid6, surface);
                         mRecordButton6.setImageResource(R.drawable.record_select);
-                        mRecordTime6.setVisibility(View.GONE);
+                        mTvRecordTime6.setVisibility(View.GONE);
                     }
                 }
             }
 
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                //stopPreview(cameraid6);
-                //closeCamera(cameraid6);
                 if (mService != null) {
                     if (getRecordingState(cameraid6)) {
                         mService.stopRender(cameraid6);
@@ -395,24 +426,21 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
             @Override
             public void onSurfaceTextureAvailable(final SurfaceTexture surface, int width, int height) {
                 mSurfaceTexture7 = surface;
-                //startPreview(cameraid7, surface);
                 if (mService != null) {
                     if (getRecordingState(cameraid7)) {
                         mService.startRender(cameraid7, surface);
                         mRecordButton7.setImageResource(R.drawable.pause_select);
-                        mRecordTime7.setVisibility(View.VISIBLE);
+                        mTvRecordTime7.setVisibility(View.VISIBLE);
                     } else {
                         startPreview(cameraid7, surface);
                         mRecordButton7.setImageResource(R.drawable.record_select);
-                        mRecordTime7.setVisibility(View.GONE);
+                        mTvRecordTime7.setVisibility(View.GONE);
                     }
                 }
             }
 
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                //mService.stopPreview(cameraid7);
-                //mService.closeCamera(cameraid7);
                 if (mService != null) {
                     if (getRecordingState(cameraid7)) {
                         mService.stopRender(cameraid7);
@@ -442,22 +470,22 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
             try {
                 if (getRecordingState(cameraid4)) {
                     mService.stopVideoRecording(cameraid4);
-                    mRecordTime4.setVisibility(View.GONE);
+                    mTvRecordTime4.setVisibility(View.GONE);
                     mRecordButton4.setImageResource(R.drawable.record_select);
                 }
                 if (getRecordingState(cameraid5)) {
                     mService.stopVideoRecording(cameraid5);
-                    mRecordTime5.setVisibility(View.GONE);
+                    mTvRecordTime5.setVisibility(View.GONE);
                     mRecordButton5.setImageResource(R.drawable.record_select);
                 }
                 if (getRecordingState(cameraid6)) {
                     mService.stopVideoRecording(cameraid6);
-                    mRecordTime6.setVisibility(View.GONE);
+                    mTvRecordTime6.setVisibility(View.GONE);
                     mRecordButton6.setImageResource(R.drawable.record_select);
                 }
                 if (getRecordingState(cameraid7)) {
                     mService.stopVideoRecording(cameraid7);
-                    mRecordTime7.setVisibility(View.GONE);
+                    mTvRecordTime7.setVisibility(View.GONE);
                     mRecordButton7.setImageResource(R.drawable.record_select);
                 }
             } catch (Exception e) {
