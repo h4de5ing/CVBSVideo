@@ -8,10 +8,9 @@
 
     <Button
         android:id="@+id/btn_open_camera"
-        android:layout_width="400dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerInParent="true"
-        android:text="open Camera" />
+        android:text="OpenCamera" />
 
     <Button
         android:id="@+id/btn_setting_standard"
@@ -20,6 +19,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginRight="30dp"
         android:layout_marginTop="30dp"
+        android:background="@color/colorAccent"
         android:text="@string/setting_standard" />
 
 </RelativeLayout>

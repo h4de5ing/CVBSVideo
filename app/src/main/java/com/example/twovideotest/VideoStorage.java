@@ -6,11 +6,14 @@ import android.database.Cursor;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
 import android.provider.MediaStore.MediaColumns;
 import android.provider.MediaStore.Video;
 import android.util.Log;
+
+import com.example.twovideotest.utils.DeleteUtils;
 
 import java.io.File;
 
@@ -18,14 +21,19 @@ public class VideoStorage {
 
     private static final String TAG = "VideoStorage";
     public static final String VIDEO_BASE_URI = "content://media/external/video/media";
-    public static final int DELETE_MAX_TIMES = 5;
-    public static final long LOW_STORAGE_THRESHOLD_BYTES = 2 * 1024 * 1024 * 1024;// 1G
+    public static final int DELETE_MAX_TIMES = 10;
+    public static final long LOW_STORAGE_THRESHOLD_BYTES = 500 * 1024 * 1024;//500M
     private static final String sdcardPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-    public static final String tfPath = sdcardPath;//"/storage/card";
+    public static final String tfPath = "/storage/card";
     public static final int OUTPUTFORMAT = 8;
 
     public static String getFileRootPath() {
-        return new File(tfPath).exists() ? tfPath : sdcardPath;
+        if ("E9635".equalsIgnoreCase(Build.DEVICE)) {
+            return sdcardPath;
+        } else {
+            //return new File(tfPath).exists() ? tfPath : sdcardPath;
+            return tfPath;
+        }
     }
 
     public static String getSaveVideoFilePath() {
@@ -105,12 +113,7 @@ public class VideoStorage {
         if (getStorageSpaceBytes() > LOW_STORAGE_THRESHOLD_BYTES) {
             return true;
         }
-        //new Thread(new Runnable() {
-        //    @Override
-        //    public void run() {
-        //        DeleteUtils.deleteFile(getSaveVideoFilePath());
-        //    }
-        //}).start();
+
         while (deleteTimes < DELETE_MAX_TIMES) {
             deleteVideoFile(resolver, format);
             deleteTimes++;

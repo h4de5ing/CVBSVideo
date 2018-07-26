@@ -64,7 +64,8 @@
         <service
             android:name=".WatchdogService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true"
+            tools:remove=":CvbsWatchdogService" />
     </application>
 
 </manifest>

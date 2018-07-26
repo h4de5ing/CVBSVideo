@@ -12,7 +12,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class SettingStandardActivity extends AppCompatActivity {
 
@@ -33,10 +39,22 @@ public class SettingStandardActivity extends AppCompatActivity {
         } else {
             hasPermission = true;
         }
-        findViewById(R.id.btn_open_camera).setOnClickListener(new View.OnClickListener() {
+        Button open = (Button) findViewById(R.id.btn_open_camera);
+
+        open.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startMainActivity();
+                //startMainActivity();
+                if ("E9635".equalsIgnoreCase(Build.DEVICE)) {
+                    String value = getNodeValue();
+                    if ("0".equals(value)) {
+                        startActivity(new Intent(SettingStandardActivity.this, MainActivity7in.class));
+                    } else {
+                        startActivity(new Intent(SettingStandardActivity.this, FourVideoActivity.class));
+                    }
+                } else {
+                    startActivity(new Intent(SettingStandardActivity.this, MainActivity.class));
+                }
             }
         });
         findViewById(R.id.btn_setting_standard).setOnClickListener(new View.OnClickListener() {
@@ -102,6 +120,16 @@ public class SettingStandardActivity extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         if (dialog != null && !dialog.isShowing()) {
             dialog.show();
+        }
+    }
+
+    public static String getNodeValue() {
+        try {
+            String path = "/sys/class/misc/sunxi-gps/rf-ctrl/lcd_select_state";
+            return new BufferedReader(new FileReader(new File(path))).readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return e.getMessage();
         }
     }
 }

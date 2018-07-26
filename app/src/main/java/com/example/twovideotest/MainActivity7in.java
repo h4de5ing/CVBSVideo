@@ -293,37 +293,29 @@ public class MainActivity7in extends Activity implements View.OnClickListener {
         int id = view.getId();
         switch (id) {
             case R.id.recordbutton:
-                if (new File(VideoStorage.tfPath).exists()) {
-                    if (mService != null) {
-                        if (getRecordingState(cameraid6)) {
-                            mService.stopVideoRecording(cameraid6);
-                            mRecordTime.setVisibility(View.GONE);
-                            mRecordButton.setImageResource(R.drawable.record_select);
-                        } else {
-                            mService.startVideoRecording(cameraid6, mSurfaceTexture0);
-                            mRecordTime.setVisibility(View.VISIBLE);
-                            mRecordButton.setImageResource(R.drawable.pause_select);
-                        }
+                if (mService != null) {
+                    if (getRecordingState(cameraid6)) {
+                        mService.stopVideoRecording(cameraid6);
+                        mRecordTime.setVisibility(View.GONE);
+                        mRecordButton.setImageResource(R.drawable.record_select);
+                    } else {
+                        mService.startVideoRecording(cameraid6, mSurfaceTexture0);
+                        mRecordTime.setVisibility(View.VISIBLE);
+                        mRecordButton.setImageResource(R.drawable.pause_select);
                     }
-                } else {
-                    Toast.makeText(MainActivity7in.this, VideoStorage.tfPath + " not exists", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.recordbutton2:
-                if (new File(VideoStorage.tfPath).exists()) {
-                    if (mService != null) {
-                        if (getRecordingState(cameraid7)) {
-                            mService.stopVideoRecording(cameraid7);
-                            mRecordTime1.setVisibility(View.GONE);
-                            mRecordButton1.setImageResource(R.drawable.record_select);
-                        } else {
-                            mService.startVideoRecording(cameraid7, mSurfaceTexture1);
-                            mRecordTime1.setVisibility(View.VISIBLE);
-                            mRecordButton1.setImageResource(R.drawable.pause_select);
-                        }
+                if (mService != null) {
+                    if (getRecordingState(cameraid7)) {
+                        mService.stopVideoRecording(cameraid7);
+                        mRecordTime1.setVisibility(View.GONE);
+                        mRecordButton1.setImageResource(R.drawable.record_select);
+                    } else {
+                        mService.startVideoRecording(cameraid7, mSurfaceTexture1);
+                        mRecordTime1.setVisibility(View.VISIBLE);
+                        mRecordButton1.setImageResource(R.drawable.pause_select);
                     }
-                } else {
-                    Toast.makeText(MainActivity7in.this, VideoStorage.tfPath + " not exists", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }

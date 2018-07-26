@@ -1,9 +1,11 @@
 package com.example.twovideotest;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.SurfaceTexture;
 import android.os.Bundle;
@@ -28,6 +30,7 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
     private int cameraid6 = VIDEO6;
     private int cameraid7 = VIDEO7;
     private VideoService mService = null;
+    private BroadcastReceiver mFinishReceiver;
     private TextureView textureView4;
     private TextureView textureView5;
     private TextureView textureView6;
@@ -145,10 +148,84 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
+    private void finishReceiver() {
+        mFinishReceiver = new BroadcastReceiver() {
+
+            @Override
+            public void onReceive(Context arg0, Intent arg1) {
+                //updateFinish();
+            }
+        };
+    }
+
+    int reRecording = 1000;
+
+    private void updateFinish() {
+        Log.i("gh0st", "The memory is full");
+        try {
+            if (getRecordingState(cameraid4)) {
+                mService.stopVideoRecording(cameraid4);
+                mTvRecordTime4.setVisibility(View.GONE);
+                mRecordButton4.setImageResource(R.drawable.record_select);
+                //mHandler.postDelayed(new Runnable() {
+                //    @Override
+                //    public void run() {
+                //       mService.startVideoRecording(cameraid4, mSurfaceTexture4);
+                //       mTvRecordTime4.setVisibility(View.VISIBLE);
+                //       mRecordButton4.setImageResource(R.drawable.pause_select);
+                //    }
+                //}, reRecording);
+            }
+            if (getRecordingState(cameraid5)) {
+                mService.stopVideoRecording(cameraid5);
+                mTvRecordTime5.setVisibility(View.GONE);
+                mRecordButton5.setImageResource(R.drawable.record_select);
+                //mHandler.postDelayed(new Runnable() {
+                //    @Override
+                //    public void run() {
+                //       mService.startVideoRecording(cameraid5, mSurfaceTexture5);
+                //       mTvRecordTime5.setVisibility(View.VISIBLE);
+                //       mRecordButton5.setImageResource(R.drawable.pause_select);
+                //    }
+                //}, reRecording);
+            }
+            if (getRecordingState(cameraid6)) {
+                mService.stopVideoRecording(cameraid6);
+                mTvRecordTime6.setVisibility(View.GONE);
+                mRecordButton6.setImageResource(R.drawable.record_select);
+                //mHandler.postDelayed(new Runnable() {
+                //    @Override
+                //    public void run() {
+                //        mService.startVideoRecording(cameraid6, mSurfaceTexture6);
+                //        mTvRecordTime6.setVisibility(View.VISIBLE);
+                //        mRecordButton6.setImageResource(R.drawable.pause_select);
+                //    }
+                //}, reRecording);
+            }
+            if (getRecordingState(cameraid7)) {
+                mService.stopVideoRecording(cameraid7);
+                mTvRecordTime7.setVisibility(View.GONE);
+                mRecordButton7.setImageResource(R.drawable.record_select);
+                //mHandler.postDelayed(new Runnable() {
+                //    @Override
+                //    public void run() {
+                //       mService.startVideoRecording(cameraid7, mSurfaceTexture7);
+                //       mTvRecordTime7.setVisibility(View.VISIBLE);
+                //       mRecordButton7.setImageResource(R.drawable.pause_select);
+                //    }
+                //}, reRecording);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_four_video);
+        finishReceiver();
         Constants.zhi = (int) SPUtils.getSp(this, Constants.STANDARD_KEY, 1);
         View video4 = findViewById(R.id.video4);
         View video5 = findViewById(R.id.video5);
@@ -176,6 +253,7 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
         mRecordButton7.setOnClickListener(this);
         startVideoService();
         initVideoView();
+        registerReceiver(mFinishReceiver, new IntentFilter("com.android.cvbs.finish"));
     }
 
 
@@ -499,5 +577,6 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
         super.onDestroy();
         if (!getRecordingState(cameraid4) && !getRecordingState(cameraid5) && !getRecordingState(cameraid6) && !getRecordingState(cameraid7))
             stopVideoService();
+        if (mFinishReceiver != null) unregisterReceiver(mFinishReceiver);
     }
 }

@@ -33,6 +33,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static com.example.twovideotest.VideoStorage.getSaveVideoFilePath;
 
@@ -114,13 +117,15 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
             //stopVideoRecording();
         }
         mVideoFilename[index] = generateVideoFilename(index, mOutFormat[index]);
-        L.d("setNextFileName video" + index + "=" + mVideoFilename[index]);
+        Log.d("gh0st", "setNextFileName video" + index + "=" + mVideoFilename[index]);
         mRecordingStartTime[index] = SystemClock.uptimeMillis();
         try {
             mMediaRecorder[index].setNextSaveFile(mVideoFilename[index]);
-        } catch (IOException ex) {
-            ex.printStackTrace();
         } catch (Exception e) {
+            if (getRecordingState(index)) {
+                stopVideoRecording(index);
+            }
+            Log.e("gh0st", e.getMessage(), e);
             e.printStackTrace();
         }
     }
@@ -332,12 +337,10 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
                 }
             } else {
                 try {
-                    L.i("now not mPreviewing 2222222222222222222222222 we will start previewing");
                     //mCameraDevice[index].setDisplayOrientation(180);
                     mCameraDevice[index].startPreview();
                     SystemClock.sleep(500);
                     mCameraDevice[index].setPreviewTexture(surfaceTexture);
-                    L.i("now not mPreviewing 2222222222222222222222222 we previewing end");
                     mPreviewing[index] = true;
                 } catch (IOException ex) {
                     mPreviewing[index] = false;
@@ -401,7 +404,8 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
         // Used when emailing.
         String filename = title + VideoStorage.convertOutputFormatToFileExt(outputFileFormat);
         String mime = VideoStorage.convertOutputFormatToMimeType(outputFileFormat);
-        String path = getSaveVideoFilePath() + File.separator + filename;
+        int random = new Random().nextInt(100);
+        String path = getSaveVideoFilePath() + File.separator + random + filename;
 
         mCurrentVideoValues[index] = new ContentValues(9);
         mCurrentVideoValues[index].put(Video.Media.TITLE, title);
@@ -424,6 +428,7 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
         mMediaRecorder[index].setVideoSource(MediaRecorder.VideoSource.CAMERA);
         mMediaRecorder[index].setOutputFormat(mOutFormat[index]);
         mMediaRecorder[index].setVideoFrameRate(mFrameRate[index]);
+        mMediaRecorder[index].setMaxFileSize(100 * 1024 * 1024);
         Parameters parameters = null;
         try {
             parameters = mCameraDevice[index].getParameters();
@@ -660,14 +665,22 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
     }
 
     private void initTimer() {
-       /* new Timer().schedule(new TimerTask() {
+        new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                if (VideoStorage.getStorageSpaceBytes() < VideoStorage.LOW_STORAGE_THRESHOLD_BYTES) {
-                    DeleteUtils.deleteFile(getSaveVideoFilePath());
+                Log.i("gh0st", "videoService:" + VideoStorage.getStorageSpaceBytes() + "   " + VideoStorage.LOW_STORAGE_THRESHOLD_BYTES);
+                if (VideoStorage.getStorageSpaceBytes() <= VideoStorage.LOW_STORAGE_THRESHOLD_BYTES) {
+                    //VideoService.this.sendBroadcast(new Intent("com.android.cvbs.finish"));
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            //DeleteUtils.deleteAllFile(getSaveVideoFilePath());
+                        }
+                    }).start();
+                    stopSelf();
                 }
             }
-        }, 1000, 60 * 1000);*/
+        }, 1000, 10 * 1000);
     }
 
     @Override

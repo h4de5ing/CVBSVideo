@@ -1,5 +1,7 @@
 package com.example.twovideotest.utils;
 
+import android.util.Log;
+
 import java.io.File;
 import java.util.Iterator;
 import java.util.TreeMap;
@@ -8,6 +10,15 @@ import java.util.TreeMap;
  * 每次删除一半的文件
  */
 public class DeleteUtils {
+    public static void deleteAllFile(String path) {
+        File[] files = new File(path).listFiles();
+        if (files != null) {
+            for (File file : files) {
+                file.delete();
+            }
+        }
+    }
+
     public static void deleteFile(String path) {
         TreeMap fileList = new TreeMap<Long, String>();
         File[] files = new File(path).listFiles();
@@ -23,7 +34,7 @@ public class DeleteUtils {
                     Long key = iterator.next();
                     String name = fileList.get(key).toString();
                     boolean delete = new File(name).delete();
-                    System.out.println("deleteFile:" + name + " ,success: " + (delete));
+                    Log.i("gh0st","deleteFile:" + name + " ,success: " + (delete));
                 }
             }
         }
