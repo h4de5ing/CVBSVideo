@@ -45,7 +45,9 @@ public class SettingStandardActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //startMainActivity();
-                if ("E9635".equalsIgnoreCase(Build.DEVICE)) {
+               if ("E9631".equalsIgnoreCase(Build.DEVICE) || "E9638".equalsIgnoreCase(Build.DEVICE)) {
+                    startActivity(new Intent(SettingStandardActivity.this, MainActivity.class));
+                } else if ("E9635".equalsIgnoreCase(Build.DEVICE)) {
                     String value = getNodeValue();
                     if ("0".equals(value)) {
                         startActivity(new Intent(SettingStandardActivity.this, MainActivity7in.class));
@@ -53,7 +55,7 @@ public class SettingStandardActivity extends AppCompatActivity {
                         startActivity(new Intent(SettingStandardActivity.this, FourVideoActivity.class));
                     }
                 } else {
-                    startActivity(new Intent(SettingStandardActivity.this, MainActivity.class));
+                    startActivity(new Intent(SettingStandardActivity.this, FourVideoActivity.class));
                 }
             }
         });
@@ -77,11 +79,7 @@ public class SettingStandardActivity extends AppCompatActivity {
 
     private void startMainActivity() {
         if (hasPermission) {
-            if ("E9635".equalsIgnoreCase(Build.DEVICE)) {
-                startActivity(new Intent(SettingStandardActivity.this, FourVideoActivity.class));
-            } else {
-                startActivity(new Intent(SettingStandardActivity.this, MainActivity.class));
-            }
+            startActivity(new Intent(SettingStandardActivity.this, FourVideoActivity.class));
         } else requestPermission();
     }
 

@@ -153,15 +153,14 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
 
             @Override
             public void onReceive(Context arg0, Intent arg1) {
-                //updateFinish();
+                updateFinish();
             }
         };
     }
 
-    int reRecording = 1000;
 
     private void updateFinish() {
-        Log.i("gh0st", "The memory is full");
+        Log.i("gh0st", "The memory is full <=100M");
         try {
             if (getRecordingState(cameraid4)) {
                 mService.stopVideoRecording(cameraid4);

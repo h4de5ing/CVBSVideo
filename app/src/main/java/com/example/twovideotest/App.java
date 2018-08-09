@@ -9,6 +9,6 @@ public class App extends Application {
         super.onCreate();
         Intent intent = new Intent(Intent.ACTION_RUN);
         intent.setClass(this, WatchdogService.class);
-        //startService(intent);
+        startService(intent);
     }
 }

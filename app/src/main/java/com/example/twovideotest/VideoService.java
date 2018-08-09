@@ -232,7 +232,7 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
         long targetNextUpdateDelay;
         text = millisecondToTimeString(deltaAdjusted, false);
         targetNextUpdateDelay = 1000;
-        if (deltaAdjusted >= 1000 * 60) {// 1 minute
+        if (deltaAdjusted >= 1000 * 30) {// 1 minute
             mRecordingStartTime[index] = now;
             Message message = new Message();
             message.what = SAVE_VIDEO;
@@ -428,7 +428,7 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
         mMediaRecorder[index].setVideoSource(MediaRecorder.VideoSource.CAMERA);
         mMediaRecorder[index].setOutputFormat(mOutFormat[index]);
         mMediaRecorder[index].setVideoFrameRate(mFrameRate[index]);
-        mMediaRecorder[index].setMaxFileSize(100 * 1024 * 1024);
+        mMediaRecorder[index].setMaxFileSize(40 * 1024 * 1024);
         Parameters parameters = null;
         try {
             parameters = mCameraDevice[index].getParameters();

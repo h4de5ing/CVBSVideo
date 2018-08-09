@@ -13,8 +13,6 @@ import android.provider.MediaStore.MediaColumns;
 import android.provider.MediaStore.Video;
 import android.util.Log;
 
-import com.example.twovideotest.utils.DeleteUtils;
-
 import java.io.File;
 
 public class VideoStorage {
@@ -48,7 +46,7 @@ public class VideoStorage {
         File dir = new File(getSaveVideoFilePath());
         dir.mkdirs();
         if (!dir.isDirectory()) {
-            Log.e(TAG, "DIR is not exist ");
+            Log.e(TAG, dir.getAbsolutePath() + "DIR is not exist ");
             return 0;
         }
         if (!dir.canWrite()) {

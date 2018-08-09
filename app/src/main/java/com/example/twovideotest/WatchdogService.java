@@ -25,7 +25,7 @@ public class WatchdogService extends Service {
             @Override
             public void run() {
                 //Log.i("gh0st", "WatchdogService:" + VideoStorage.getStorageSpaceBytes());
-                if (VideoStorage.getStorageSpaceBytes() <= VideoStorage.LOW_STORAGE_THRESHOLD_BYTES) {
+                if (VideoStorage.getStorageSpaceBytes() <= 100 * 1024 * 1024) {
                     WatchdogService.this.sendBroadcast(new Intent("com.android.cvbs.finish"));
                     ////android.os.Process.killProcess(android.os.Process.myPid());
                     //Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage(getPackageName());
