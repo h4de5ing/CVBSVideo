@@ -1,0 +1,183 @@
+package com.example.twovideotest;
+
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.media.MediaRecorder;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Environment;
+import android.os.StatFs;
+import android.provider.MediaStore.MediaColumns;
+import android.provider.MediaStore.Video;
+import android.util.Log;
+
+import java.io.File;
+
+public class VideoStorage {
+
+    private static final String TAG = "VideoStorage";
+    public static final String VIDEO_BASE_URI = "content://media/external/video/media";
+    public static final int DELETE_MAX_TIMES = 10;
+    public static final long LOW_STORAGE_THRESHOLD_BYTES = 500 * 1024 * 1024;//500M
+    private static final String sdcardPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+    public static final int OUTPUTFORMAT = 8;
+
+    public static String getFileRootPath() {
+        return sdcardPath;
+    }
+
+    public static String getSaveVideoFilePath() {
+        return getFileRootPath() + File.separator + Environment.DIRECTORY_DCIM + File.separator + "Camera";
+    }
+
+    public interface OnMediaSavedListener {
+        void onMediaSaved(Uri uri);
+    }
+
+    public static long getStorageSpaceBytes() {
+        File dir = new File(getSaveVideoFilePath());
+        dir.mkdirs();
+        if (!dir.isDirectory()) {
+            Log.e(TAG, dir.getAbsolutePath() + "DIR is not exist ");
+            return 0;
+        }
+        if (!dir.canWrite()) {
+            Log.e(TAG, "DIR can not be write");
+            return 0;
+        }
+        try {
+            StatFs stat = new StatFs(getFileRootPath());
+            long size = stat.getAvailableBlocks() * (long) stat.getBlockSize();
+            Log.d(TAG, getFileRootPath() + ":getAvailableSpace=" + size / 1024 / 1024 + " M");
+            return size;
+        } catch (Exception e) {
+            Log.e(TAG, "Fail to access external storage", e);
+        }
+        return 0;
+    }
+
+    private static int queryOldVideoFile(ContentResolver resolver, int format) {
+        int videoId = -1;
+        String columns[] = new String[]{Video.Media._ID, Video.Media.DATA, MediaColumns.DATE_MODIFIED};
+        Uri uri = Uri.parse(VIDEO_BASE_URI);
+        String select;
+        if (format == OUTPUTFORMAT) {
+            select = Video.Media.DATA + " like '" + getSaveVideoFilePath() + "%.ts'";
+        } else {
+            select = Video.Media.DATA + " like '" + getSaveVideoFilePath() + "%.mp4'";
+        }
+
+        Cursor cur = resolver.query(uri, columns, select, null, MediaColumns.DATE_MODIFIED + " ASC");
+
+        if ((cur != null) && (cur.moveToFirst())) {
+            videoId = cur.getInt(cur.getColumnIndex(Video.Media._ID));
+            String path = cur.getString(cur.getColumnIndex(Video.Media.DATA));
+            Log.d(TAG, "find path =" + path + " to delete");
+            deleteVideoFile(path);
+            cur.close();
+        }
+        Log.d(TAG, "queryRecentVideoFile2222 id=" + videoId);
+        return videoId;
+    }
+
+    public static void deleteVideoFile(String fileName) {
+        Log.d(TAG, "Deleting video " + fileName);
+        File f = new File(fileName);
+        if (!f.delete()) {
+            Log.v(TAG, "Could not delete " + fileName);
+        }
+    }
+
+    private static void deleteVideoFile(ContentResolver resolver, int format) {
+        Uri uri = Uri.parse(VIDEO_BASE_URI);
+        int deleteId = -1;
+        deleteId = queryOldVideoFile(resolver, format);
+        if (deleteId > 0) {
+            resolver.delete(uri, Video.Media._ID + "=?", new String[]{Integer.toString(deleteId)});
+            Log.d(TAG, "delete " + deleteId + " succees");
+        }
+    }
+
+    public static boolean storageSpaceIsAvailable(ContentResolver resolver, int format) {
+        int deleteTimes = 0;
+        if (getStorageSpaceBytes() > LOW_STORAGE_THRESHOLD_BYTES) {
+            return true;
+        }
+
+        while (deleteTimes < DELETE_MAX_TIMES) {
+            deleteVideoFile(resolver, format);
+            deleteTimes++;
+        }
+        return true;
+    }
+
+    public static String convertOutputFormatToFileExt(int outputFileFormat) {
+        if (outputFileFormat == MediaRecorder.OutputFormat.MPEG_4) {
+            return ".mp4";
+        } else if (outputFileFormat == OUTPUTFORMAT) {
+            return ".ts";
+        }
+        return ".3gp";
+    }
+
+    public static String convertOutputFormatToMimeType(int outputFileFormat) {
+        if (outputFileFormat == MediaRecorder.OutputFormat.MPEG_4) {
+            return "video/mp4";
+        } else if (outputFileFormat == OUTPUTFORMAT) {
+            return "video/ts";
+        }
+        return "video/3gpp";
+    }
+
+    public static void addVideo(String path, long duration, ContentValues values, OnMediaSavedListener listener, ContentResolver resolver) {
+        VideoSaveTask videoSave = new VideoSaveTask(path, duration, values, listener, resolver);
+        videoSave.execute();
+    }
+
+    private static class VideoSaveTask extends AsyncTask<Void, Void, Uri> {
+
+        private String path;
+        private long duration;
+        private ContentValues values;
+        private OnMediaSavedListener listener;
+        private ContentResolver resolver;
+
+        public VideoSaveTask(String path, long duration, ContentValues values, OnMediaSavedListener listener, ContentResolver resolver) {
+            this.path = path;
+            this.duration = duration;
+            this.values = new ContentValues(values);
+            this.listener = listener;
+            this.resolver = resolver;
+        }
+
+        public VideoSaveTask(String path) {
+            this.path = path;
+        }
+
+        @Override
+        protected Uri doInBackground(Void... arg0) {
+            Uri uri = null;
+            if (new File(path).length() > 0) {
+                values.put(Video.Media.SIZE, new File(path).length());
+                values.put(Video.Media.DURATION, duration);
+                try {
+                    Uri videoTable = Uri.parse(VIDEO_BASE_URI);
+                    Log.d(TAG, "videoTable=" + videoTable);
+                    uri = resolver.insert(videoTable, values);
+                } catch (Exception e) {
+                    Log.e(TAG, "failed to add video to media storage:" + e);
+                }
+            }
+            return uri;
+        }
+
+
+        @Override
+        protected void onPostExecute(Uri result) {
+            if (listener != null && result != null) {
+                listener.onMediaSaved(result);
+            }
+        }
+    }
+}
