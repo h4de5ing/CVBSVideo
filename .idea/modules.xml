@@ -4,7 +4,9 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/CVBSVideo.iml" filepath="$PROJECT_DIR$/CVBSVideo.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dvr/dvr.iml" filepath="$PROJECT_DIR$/dvr/dvr.iml" />
       <module fileurl="file://$PROJECT_DIR$/usbcamera/usbcamera.iml" filepath="$PROJECT_DIR$/usbcamera/usbcamera.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usbcamerarecored/usbcamerarecored.iml" filepath="$PROJECT_DIR$/usbcamerarecored/usbcamerarecored.iml" />
     </modules>
   </component>
 </project>
