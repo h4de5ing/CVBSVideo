@@ -13,13 +13,11 @@ replace android.jar
 Android_sdk\sdk\platforms\android-23\android.jar
 
 ## modules:
-app:
 
-rearvideo:
+# 注意：部分Android SDK的源码我们修改过,如果编译报错请在release下载android.jar 替换你的sdk目录下的android.jar
 
-dvr:
-
-目前我们平台支持2路cvbs视频拍照录像
+支持4路CVBS Camera 640X480的拍照录像,Camera节点分别为4 5 6 7 参考app module代码
+支持4路USB Camera 最大1280X720的拍照录像,Camera节点分别为0 1 2 3 参考 usbcamerarecored module代码
 
 [下载android.jar](https://github.com/h4de5ing/CVBSVideo/releases/tag/android-23)
 

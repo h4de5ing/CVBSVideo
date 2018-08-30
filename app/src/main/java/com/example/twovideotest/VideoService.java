@@ -274,6 +274,8 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
             } else if (index == 7) {
                 Constants.setStandard(Constants.path7, Constants.zhi);
             }
+            int cameraCount = Camera.getNumberOfCameras();
+            Log.i("gh0st", "摄像头个数:" + cameraCount);
             mCameraDevice[index] = Camera.open(index);
         } catch (Exception ex) {
             mCameraDevice[index] = null;

@@ -9,6 +9,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 
+import java.io.File;
+
 /**
  * open cvbs in FactorySuite
  */
@@ -25,8 +27,7 @@ public class PermissionActivity2 extends AppCompatActivity {
                     Manifest.permission.CAMERA,
                     Manifest.permission.RECORD_AUDIO}, 0);
         } else {
-            startActivity(new Intent(PermissionActivity2.this, FourVideoActivity.class));
-            finish();
+            startActivity();
         }
     }
 
@@ -34,14 +35,23 @@ public class PermissionActivity2 extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (grantResults.length > 0 && requestCode == 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            startActivity(new Intent(PermissionActivity2.this, FourVideoActivity.class));
-            finish();
+            startActivity();
         }
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        finish();
+    }
+
+    private void startActivity() {
+        String value = FileUtils.getNodeValue();
+        if ("0".equals(value)) {
+            startActivity(new Intent(PermissionActivity2.this, MainActivity7in.class));
+        } else {
+            startActivity(new Intent(PermissionActivity2.this, FourVideoActivity.class));
+        }
         finish();
     }
 }

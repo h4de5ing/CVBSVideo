@@ -3,7 +3,10 @@ package com.example.twovideotest;
 import android.annotation.SuppressLint;
 import android.os.Environment;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
@@ -33,5 +36,14 @@ public class FileUtils {
             return mediaFile = new File(mediaStorageDir.getPath() + File.separator + "DVR_" + timeStamp + ".dvr");
         }
         return mediaFile;
+    }
+    public static String getNodeValue() {
+        try {
+            String path = "/sys/class/misc/sunxi-gps/rf-ctrl/lcd_select_state";
+            return new BufferedReader(new FileReader(new File(path))).readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return e.getMessage();
+        }
     }
 }

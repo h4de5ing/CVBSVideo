@@ -48,7 +48,7 @@ public class SettingStandardActivity extends AppCompatActivity {
                if ("E9631".equalsIgnoreCase(Build.DEVICE) || "E9638".equalsIgnoreCase(Build.DEVICE)) {
                     startActivity(new Intent(SettingStandardActivity.this, MainActivity.class));
                 } else if ("E9635".equalsIgnoreCase(Build.DEVICE)) {
-                    String value = getNodeValue();
+                    String value = FileUtils.getNodeValue();
                     if ("0".equals(value)) {
                         startActivity(new Intent(SettingStandardActivity.this, MainActivity7in.class));
                     } else {
@@ -121,13 +121,4 @@ public class SettingStandardActivity extends AppCompatActivity {
         }
     }
 
-    public static String getNodeValue() {
-        try {
-            String path = "/sys/class/misc/sunxi-gps/rf-ctrl/lcd_select_state";
-            return new BufferedReader(new FileReader(new File(path))).readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return e.getMessage();
-        }
-    }
 }
