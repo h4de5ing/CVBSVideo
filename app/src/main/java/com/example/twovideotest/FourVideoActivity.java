@@ -47,6 +47,10 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
     private TextView mTvRecordTime5;
     private TextView mTvRecordTime6;
     private TextView mTvRecordTime7;
+    private int mVideo4InitSuccess = -1;
+    private int mVideo5InitSuccess = -1;
+    private int mVideo6InitSuccess = -1;
+    private int mVideo7InitSuccess = -1;
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
         @Override
@@ -71,79 +75,107 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
     @Override
     public void onClick(View view) {
         int tag = (int) view.getTag();
-        Log.i("gh0st", "onClick:" + tag);
+        Log.i("gh0st", "start onClick:" + tag);
         switch (tag) {
             case VIDEO4:
-                mRecordButton4.setEnabled(false);
-                if (getRecordingState(cameraid4)) {
-                    mService.stopVideoRecording(cameraid4);
-                    mTvRecordTime4.setVisibility(View.GONE);
-                    mRecordButton4.setImageResource(R.drawable.record_select);
-                } else {
-                    mService.startVideoRecording(cameraid4, mSurfaceTexture4);
-                    mTvRecordTime4.setVisibility(View.VISIBLE);
-                    mRecordButton4.setImageResource(R.drawable.pause_select);
-                }
-                mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mRecordButton4.setEnabled(true);
+                if (mVideo4InitSuccess != -1) {
+                    mRecordButton4.setEnabled(false);
+                    if (getRecordingState(cameraid4)) {
+                        mService.stopVideoRecording(cameraid4);
+                        mTvRecordTime4.setVisibility(View.GONE);
+                        mRecordButton4.setImageResource(R.drawable.record_select);
+                    } else {
+                        mService.startVideoRecording(cameraid4, mSurfaceTexture4);
+                        mTvRecordTime4.setVisibility(View.VISIBLE);
+                        mRecordButton4.setImageResource(R.drawable.pause_select);
                     }
-                }, 1000);
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!isDestroyed()) {
+                                mRecordButton4.setEnabled(true);
+                            }
+                        }
+                    }, 1000);
+                } else {
+                    Log.e("gh0st", "Video4 init fail" + mVideo4InitSuccess);
+                }
+                Log.i("gh0st", "end onClick:" + tag);
                 break;
             case VIDEO5:
-                mRecordButton5.setEnabled(false);
-                if (getRecordingState(cameraid5)) {
-                    mService.stopVideoRecording(cameraid5);
-                    mTvRecordTime5.setVisibility(View.GONE);
-                    mRecordButton5.setImageResource(R.drawable.record_select);
-                } else {
-                    mService.startVideoRecording(cameraid5, mSurfaceTexture5);
-                    mTvRecordTime5.setVisibility(View.VISIBLE);
-                    mRecordButton5.setImageResource(R.drawable.pause_select);
-                }
-                mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mRecordButton5.setEnabled(true);
+                if (mVideo5InitSuccess != -1) {
+                    mRecordButton5.setEnabled(false);
+                    if (getRecordingState(cameraid5)) {
+                        mService.stopVideoRecording(cameraid5);
+                        mTvRecordTime5.setVisibility(View.GONE);
+                        mRecordButton5.setImageResource(R.drawable.record_select);
+                    } else {
+                        mService.startVideoRecording(cameraid5, mSurfaceTexture5);
+                        mTvRecordTime5.setVisibility(View.VISIBLE);
+                        mRecordButton5.setImageResource(R.drawable.pause_select);
                     }
-                }, 1000);
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!isDestroyed()) {
+                                mRecordButton5.setEnabled(true);
+                            }
+                        }
+                    }, 1000);
+                } else {
+                    Log.e("gh0st", "Video5 init fail" + mVideo5InitSuccess);
+                }
+                Log.i("gh0st", "end onClick:" + tag);
                 break;
             case VIDEO6:
-                mRecordButton6.setEnabled(false);
-                if (getRecordingState(cameraid6)) {
-                    mService.stopVideoRecording(cameraid6);
-                    mTvRecordTime6.setVisibility(View.GONE);
-                    mRecordButton6.setImageResource(R.drawable.record_select);
-                } else {
-                    mService.startVideoRecording(cameraid6, mSurfaceTexture6);
-                    mTvRecordTime6.setVisibility(View.VISIBLE);
-                    mRecordButton6.setImageResource(R.drawable.pause_select);
-                }
-                mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mRecordButton6.setEnabled(true);
+                if (mVideo6InitSuccess != -1) {
+                    mRecordButton6.setEnabled(false);
+                    if (getRecordingState(cameraid6)) {
+                        mService.stopVideoRecording(cameraid6);
+                        mTvRecordTime6.setVisibility(View.GONE);
+                        mRecordButton6.setImageResource(R.drawable.record_select);
+                    } else {
+                        mService.startVideoRecording(cameraid6, mSurfaceTexture6);
+                        mTvRecordTime6.setVisibility(View.VISIBLE);
+                        mRecordButton6.setImageResource(R.drawable.pause_select);
                     }
-                }, 1000);
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!isDestroyed()) {
+                                mRecordButton6.setEnabled(true);
+                            }
+                        }
+                    }, 1000);
+                } else {
+                    Log.e("gh0st", "Video6 init fail" + mVideo6InitSuccess);
+                }
+                Log.i("gh0st", "end onClick:" + tag);
                 break;
             case VIDEO7:
-                mRecordButton7.setEnabled(false);
-                if (getRecordingState(cameraid7)) {
-                    mService.stopVideoRecording(cameraid7);
-                    mTvRecordTime7.setVisibility(View.GONE);
-                    mRecordButton7.setImageResource(R.drawable.record_select);
-                } else {
-                    mService.startVideoRecording(cameraid7, mSurfaceTexture7);
-                    mTvRecordTime7.setVisibility(View.VISIBLE);
-                    mRecordButton7.setImageResource(R.drawable.pause_select);
-                }
-                mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mRecordButton7.setEnabled(true);
+                if (mVideo7InitSuccess != -1) {
+                    mRecordButton7.setEnabled(false);
+                    if (getRecordingState(cameraid7)) {
+                        mService.stopVideoRecording(cameraid7);
+                        mTvRecordTime7.setVisibility(View.GONE);
+                        mRecordButton7.setImageResource(R.drawable.record_select);
+                    } else {
+                        mService.startVideoRecording(cameraid7, mSurfaceTexture7);
+                        mTvRecordTime7.setVisibility(View.VISIBLE);
+                        mRecordButton7.setImageResource(R.drawable.pause_select);
                     }
-                }, 1000);
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!isDestroyed()) {
+                                mRecordButton7.setEnabled(true);
+                            }
+                        }
+                    }, 1000);
+                } else {
+                    Log.e("gh0st", "Video7 init fail" + mVideo7InitSuccess);
+                }
+                Log.i("gh0st", "end onClick:" + tag);
                 break;
         }
     }
@@ -295,13 +327,23 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
     @Override
     protected void onResume() {
         super.onResume();
+        Log.i("gh0st", "onResume");
         bindVideoService();
+        textureView4.setVisibility(View.VISIBLE);
+        textureView5.setVisibility(View.VISIBLE);
+        textureView6.setVisibility(View.VISIBLE);
+        textureView7.setVisibility(View.VISIBLE);
         //initVideoView();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        Log.i("gh0st", "onPause");
+        textureView4.setVisibility(View.GONE);
+        textureView5.setVisibility(View.GONE);
+        textureView6.setVisibility(View.GONE);
+        textureView7.setVisibility(View.GONE);
         //stopPreview(cameraid6);
         //stopPreview(cameraid7);
         unbindVideoService();
@@ -336,9 +378,12 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
-    private void startPreview(int cameraId, SurfaceTexture surfaceTexture) {
+    private int startPreview(int cameraId, SurfaceTexture surfaceTexture) {
+        Log.i("gh0st", "startPreview " + cameraId);
         if (mService != null && (surfaceTexture != null)) {
-            mService.startPreview(cameraId, surfaceTexture);
+            return mService.startPreview(cameraId, surfaceTexture);
+        } else {
+            return -2;
         }
     }
 
@@ -362,25 +407,29 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
 
     private void initVideo4() {
         if (mService != null) {
-            startPreview(cameraid4, textureView4.getSurfaceTexture());
+            Log.i("gh0st", "startPreview initVideo4");
+            mVideo4InitSuccess = startPreview(cameraid4, textureView4.getSurfaceTexture());
         }
     }
 
     private void initVideo5() {
         if (mService != null) {
-            startPreview(cameraid5, textureView5.getSurfaceTexture());
+            Log.i("gh0st", "startPreview initVideo5");
+            mVideo5InitSuccess = startPreview(cameraid5, textureView5.getSurfaceTexture());
         }
     }
 
     private void initVideo6() {
         if (mService != null) {
-            startPreview(cameraid6, textureView6.getSurfaceTexture());
+            Log.i("gh0st", "startPreview initVideo6");
+            mVideo6InitSuccess = startPreview(cameraid6, textureView6.getSurfaceTexture());
         }
     }
 
     private void initVideo7() {
         if (mService != null) {
-            startPreview(cameraid7, textureView7.getSurfaceTexture());
+            Log.i("gh0st", "startPreview initVideo7");
+            mVideo7InitSuccess = startPreview(cameraid7, textureView7.getSurfaceTexture());
         }
     }
 
@@ -569,11 +618,23 @@ public class FourVideoActivity extends AppCompatActivity implements View.OnClick
                 e.printStackTrace();
             }
         }
+/*        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (isDestronedaaa) {
+                    finish();
+                    Log.i("gh0st","delayed finish ................................");
+                }
+            }
+        }, 800);*/
     }
+
+    private boolean isDestronedaaa = false;
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        isDestronedaaa = true;
         if (!getRecordingState(cameraid4) && !getRecordingState(cameraid5) && !getRecordingState(cameraid6) && !getRecordingState(cameraid7))
             stopVideoService();
         if (mFinishReceiver != null) unregisterReceiver(mFinishReceiver);

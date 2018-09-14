@@ -14,8 +14,8 @@ android {
         applicationId "com.example.twovideotest2"
         minSdkVersion 21
         targetSdkVersion 23
-        versionCode 36
-        versionName "4.2"
+        versionCode 46
+        versionName "4.6"
         signingConfig signingConfigs.release
     }
     buildTypes {

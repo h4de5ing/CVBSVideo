@@ -275,7 +275,7 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
                 Constants.setStandard(Constants.path7, Constants.zhi);
             }
             int cameraCount = Camera.getNumberOfCameras();
-            Log.i("gh0st", "摄像头个数:" + cameraCount);
+            //Log.i("gh0st", "摄像头个数:" + cameraCount);
             mCameraDevice[index] = Camera.open(index);
         } catch (Exception ex) {
             mCameraDevice[index] = null;
@@ -320,6 +320,7 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
     }
 
     public synchronized int startPreview(int index, SurfaceTexture surfaceTexture) {
+        Log.i("gh0st", "startPreview openCamera");
         int state = openCamera(index);
         L.d("startPreview index=" + index + " openCamera:" + state + " " + (mCameraDevice[index] == null));
         if (state == -1) {
@@ -351,6 +352,7 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
                     return FAIL;
                 } catch (Exception e) {
                     e.printStackTrace();
+                    return FAIL;
                 }
             }
         }
@@ -427,10 +429,12 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
         // Unlock the camera object before passing it to media recorder.
         mCameraDevice[index].unlock();
         mMediaRecorder[index].setCamera(mCameraDevice[index]);
+        //mMediaRecorder[index].setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
         mMediaRecorder[index].setVideoSource(MediaRecorder.VideoSource.CAMERA);
         mMediaRecorder[index].setOutputFormat(mOutFormat[index]);
         mMediaRecorder[index].setVideoFrameRate(mFrameRate[index]);
         mMediaRecorder[index].setMaxFileSize(40 * 1024 * 1024);
+        //mMediaRecorder[index].setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
         Parameters parameters = null;
         try {
             parameters = mCameraDevice[index].getParameters();
@@ -542,6 +546,7 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
     }
 
     public int startVideoRecording(int index, SurfaceTexture surfaceTexture) {
+        Log.i("gh0st", "startVideoRecording openCamera");
         if (!VideoStorage.storageSpaceIsAvailable(getContentResolver(), mOutFormat[index])) {
             L.e("Not enough storage space!!!");
             Toast.makeText(this, "Not enough storage space!!!", Toast.LENGTH_LONG).show();
@@ -551,44 +556,48 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
             Toast.makeText(this, "recording!!!", Toast.LENGTH_LONG).show();
             return FAIL;
         }
-        openCamera(index);
-        if (surfaceTexture != null) {
-            mSurfaceTexture[index] = surfaceTexture;
-        } else {
-            surfaceTexture = mSurfaceTexture[index];
-        }
-        if (mMediaRecorderRecording[index]) {
-            if (isUVCCameraSonix(index) == index) {
-                try {
-                    mCameraDevice[index].setPreviewTexture(surfaceTexture);
-                } catch (IOException io) {
-                    L.e("startVideoRecording setPreviewTexture set error!!");
-                }
-                L.d("startVideoRecording return");
-                return BAD_VALUE;
+        int state = openCamera(index);
+        if (state != -1) {
+            if (surfaceTexture != null) {
+                mSurfaceTexture[index] = surfaceTexture;
+            } else {
+                surfaceTexture = mSurfaceTexture[index];
             }
-        }
-        initializeRecorder(index);
-        if (mMediaRecorder[index] == null) {
-            L.e("Fail to initialize media recorder");
+            if (mMediaRecorderRecording[index]) {
+                if (isUVCCameraSonix(index) == index) {
+                    try {
+                        mCameraDevice[index].setPreviewTexture(surfaceTexture);
+                    } catch (IOException io) {
+                        L.e("startVideoRecording setPreviewTexture set error!!");
+                    }
+                    L.d("startVideoRecording return");
+                    return BAD_VALUE;
+                }
+            }
+            initializeRecorder(index);
+            if (mMediaRecorder[index] == null) {
+                L.e("Fail to initialize media recorder");
+                return FAIL;
+            }
+            pauseAudioPlayback();
+            mRecordingStartTime[index] = SystemClock.uptimeMillis();
+            L.d("index=" + index);
+            try {
+                mMediaRecorder[index].start(); // Recording is now started
+            } catch (RuntimeException e) {
+                L.e("Could not start media recorder. " + e);
+                releaseMediaRecorder(index);
+                // If start fails, frameworks will not lock the camera for us.
+                mCameraDevice[index].lock();
+                return FAIL;
+            }
+            mMediaRecorderRecording[index] = true;
+            L.d("mMediaRecorderRecording[ " + index + " ]=" + mMediaRecorderRecording[index]);
+            updateRecordingTime(index);
+            return OK;
+        } else {
             return FAIL;
         }
-        pauseAudioPlayback();
-        mRecordingStartTime[index] = SystemClock.uptimeMillis();
-        L.d("index=" + index);
-        try {
-            mMediaRecorder[index].start(); // Recording is now started
-        } catch (RuntimeException e) {
-            L.e("Could not start media recorder. " + e);
-            releaseMediaRecorder(index);
-            // If start fails, frameworks will not lock the camera for us.
-            mCameraDevice[index].lock();
-            return FAIL;
-        }
-        mMediaRecorderRecording[index] = true;
-        L.d("mMediaRecorderRecording[ " + index + " ]=" + mMediaRecorderRecording[index]);
-        updateRecordingTime(index);
-        return OK;
     }
 
     public int stopVideoRecording(int index) {

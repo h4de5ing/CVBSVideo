@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -45,7 +46,8 @@ public class SettingStandardActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //startMainActivity();
-               if ("E9631".equalsIgnoreCase(Build.DEVICE) || "E9638".equalsIgnoreCase(Build.DEVICE)) {
+                Log.i("gh0st", "SettingStandardActivity open Camera");
+                if ("E9631".equalsIgnoreCase(Build.DEVICE) || "E9638".equalsIgnoreCase(Build.DEVICE)) {
                     startActivity(new Intent(SettingStandardActivity.this, MainActivity.class));
                 } else if ("E9635".equalsIgnoreCase(Build.DEVICE)) {
                     String value = FileUtils.getNodeValue();
@@ -57,6 +59,7 @@ public class SettingStandardActivity extends AppCompatActivity {
                 } else {
                     startActivity(new Intent(SettingStandardActivity.this, FourVideoActivity.class));
                 }
+                finish();
             }
         });
         findViewById(R.id.btn_setting_standard).setOnClickListener(new View.OnClickListener() {
