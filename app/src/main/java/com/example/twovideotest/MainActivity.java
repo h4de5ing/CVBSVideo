@@ -197,12 +197,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
     protected void onResume() {
         super.onResume();
         bindVideoService();
+        textureView6.setVisibility(View.VISIBLE);
+        textureView7.setVisibility(View.VISIBLE);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         unbindVideoService();
+        textureView6.setVisibility(View.GONE);
+        textureView7.setVisibility(View.GONE);
     }
 
     @Override
