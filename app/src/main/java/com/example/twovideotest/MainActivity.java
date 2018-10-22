@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
+import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.ImageButton;
@@ -210,9 +211,31 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Log.i("gh0st", "onBackPressed");
+        if (mService != null) {
+            try {
+                if (getRecordingState(cameraid6)) {
+                    mService.stopVideoRecording(cameraid6);
+                    mRecordTime.setVisibility(View.GONE);
+                    mRecordButton.setImageResource(R.drawable.record_select);
+                }
+                if (getRecordingState(cameraid7)) {
+                    mService.stopVideoRecording(cameraid7);
+                    mRecordTime1.setVisibility(View.GONE);
+                    mRecordButton1.setImageResource(R.drawable.record_select);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
-        try {
+/*        try {
             if (getRecordingState(cameraid6)) {
                 mService.stopVideoRecording(cameraid6);
                 mRecordTime.setVisibility(View.GONE);
@@ -225,7 +248,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
         if (!getRecordingState(cameraid6) && !getRecordingState(cameraid7)) stopVideoService();
         if (mReceiver != null) unregisterReceiver(mReceiver);
     }
@@ -297,8 +320,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         int id = view.getId();
         switch (id) {
             case R.id.recordbutton:
-                if (new File(VideoStorage.tfPath).exists()) {
+                if (new File(VideoStorage.getFileRootPath()).exists()) {
                     if (mService != null) {
+                        mRecordButton.setEnabled(false);
                         if (getRecordingState(cameraid6)) {
                             mService.stopVideoRecording(cameraid6);
                             mRecordTime.setVisibility(View.GONE);
@@ -308,14 +332,23 @@ public class MainActivity extends Activity implements View.OnClickListener {
                             mRecordTime.setVisibility(View.VISIBLE);
                             mRecordButton.setImageResource(R.drawable.pause_select);
                         }
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (!isDestroyed()) {
+                                    mRecordButton.setEnabled(true);
+                                }
+                            }
+                        }, 1000);
                     }
                 } else {
                     Toast.makeText(MainActivity.this, VideoStorage.tfPath + " not exists", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.recordbutton2:
-                if (new File(VideoStorage.tfPath).exists()) {
+                if (new File(VideoStorage.getFileRootPath()).exists()) {
                     if (mService != null) {
+                        mRecordButton1.setEnabled(false);
                         if (getRecordingState(cameraid7)) {
                             mService.stopVideoRecording(cameraid7);
                             mRecordTime1.setVisibility(View.GONE);
@@ -325,6 +358,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
                             mRecordTime1.setVisibility(View.VISIBLE);
                             mRecordButton1.setImageResource(R.drawable.pause_select);
                         }
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (!isDestroyed()) {
+                                    mRecordButton1.setEnabled(true);
+                                }
+                            }
+                        }, 1000);
                     }
                 } else {
                     Toast.makeText(MainActivity.this, VideoStorage.tfPath + " not exists", Toast.LENGTH_SHORT).show();

@@ -29,8 +29,8 @@ public class VideoStorage {
         if ("E9635".equalsIgnoreCase(Build.DEVICE)) {
             return sdcardPath;
         } else {
-            //return new File(tfPath).exists() ? tfPath : sdcardPath;
-            return tfPath;
+            return new File(tfPath).exists() ? tfPath : sdcardPath;
+            //return tfPath;
         }
     }
 
