@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.SurfaceTexture;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -26,7 +27,7 @@ import java.io.File;
 
 
 //readme
-/*
+/*for T3 Camera
  * 1:support 2 camera preview and recorder
  * 2:support recorder in background
  * {
@@ -54,13 +55,34 @@ import java.io.File;
  * 		mCameraDevice[index].setAnalogInputColor(67, 50, 100); //setting brightness and so on
  * }
  *
+ * 6:mIsSupport2Video true:2 camera false:1 camera
+ *
+ *
+ * CSI or usb camera
+ *video0
+ *video1
+ *video2
+ *video3
+ *
+ *
  *CVBS Camera
+ *video4
+ *video5
  *video6
  *video7
  *
-  *This apk support:
+ *If you use sonix camera with two camera video ,please reference
+ *android\device\softwinner\common\prebuild\CarVideo\
+ *
+ *This apk support:
  *camera0 preview (yuv,mjpeg)
  *camera1 recorder (720P or 1080p)
+ *
+ *
+ *
+ *
+ *
+ *
  *
  * */
 public class MainActivity extends Activity implements View.OnClickListener {

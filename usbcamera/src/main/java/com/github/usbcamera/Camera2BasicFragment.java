@@ -286,7 +286,6 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
         private void process(CaptureResult result) {
             switch (mState) {
                 case STATE_PREVIEW: {
-                    // We have nothing to do when the camera preview is working normally.
                     break;
                 }
                 case STATE_WAITING_LOCK: {
@@ -582,7 +581,7 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
                 Boolean available = characteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
                 mFlashSupported = available == null ? false : available;
 
-                mCameraId = cameraId;
+                mCameraId = "6";//cameraId;
                 return;
             }
         } catch (CameraAccessException e) {

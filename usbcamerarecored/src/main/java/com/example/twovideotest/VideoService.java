@@ -94,7 +94,7 @@ public class VideoService extends Service implements MediaRecorder.OnErrorListen
             }
 
             mOutFormat[i] = VideoStorage.OUTPUTFORMAT;
-            mFrameRate[i] = 30;
+            mFrameRate[i] = 30;//帧率
             mRecorderBitRate[i] = 6000000;//6M
         }
     }
