@@ -3,23 +3,34 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion 27
-
-
-
+    signingConfigs {
+        release {
+            keyAlias 'android'
+            keyPassword 'androidpass'
+            storeFile file('../app/E9631.jks')
+            storePassword 'android'
+        }
+    }
     defaultConfig {
-        applicationId "com.android.reversing"
+        applicationId "com.android.reversing2"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 1
-        versionName "1.0"
-
+        versionCode 11
+        versionName "1.1"
+        signingConfig signingConfigs.release
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     }
 
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            signingConfig signingConfigs.release
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

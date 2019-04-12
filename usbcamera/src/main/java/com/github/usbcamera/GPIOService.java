@@ -34,6 +34,9 @@ public class GPIOService extends Service {
         }, 1000, 1000);
     }
 
+    boolean mLastPreviewing = false;
+    boolean mCurrentPreviewing = false;
+
     private void initData() {
         try {
             mService = CommunicationService.getInstance(this);
@@ -47,8 +50,10 @@ public class GPIOService extends Service {
                         if (0x12 == data[0]) {
                             if (0x01 == data[1]) {//高
                                 Log.i("gh0st", "高");
+                                mCurrentPreviewing = true;
                                 startA();
                             } else {//低
+                                mCurrentPreviewing = false;
                                 Log.i("gh0st", "低");
                                 stopServiceActivity();
                             }
@@ -98,15 +103,25 @@ public class GPIOService extends Service {
         }
     }
 
+    int i = 0;
+
     private void startA() {
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
+        if (mLastPreviewing != mCurrentPreviewing && mCurrentPreviewing && i == 0) {
+            //Log.i("gh1st", "startA   " + mLastPreviewing + " " + mCurrentPreviewing);
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        }
+        i++;
     }
 
     private void stopServiceActivity() {
-        Intent intent = new Intent("android.intent.action.FINISH_SERVICE_ACTIVITY");
-        sendBroadcast(intent);
+        if (mLastPreviewing == mCurrentPreviewing && !mCurrentPreviewing && i != 0) {
+            //Log.i("gh1st", "stopServiceActivity   " + mLastPreviewing + " " + mCurrentPreviewing);
+            Intent intent = new Intent("android.intent.action.FINISH_SERVICE_ACTIVITY");
+            sendBroadcast(intent);
+        }
+        i = 0;
     }
 
     @Override
